@@ -1,0 +1,18 @@
+Package: ImbRegSamp
+Type: Package
+Title: Resampling for Imbalanced Regression
+Version: 0.1.0
+Authors@R: 
+        c(person("Fatih", "Saglam", email = "saglamf89@gmail.com", 
+        role = c("aut", "cre"), 
+        comment = c(ORCID = "0000-0002-2084-2008")))
+Description: Resamples imbalanced datasets to better estimate rare values in regression.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.1
+Imports: 
+    FNN,
+    ks,
+    methods,
+    Rfast
