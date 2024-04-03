@@ -3,7 +3,7 @@ Sampling methods for imbalanced regression. There is a well-coded UBL package fo
 
 1- SMOTER
 
-It will be updated.
+More methods will be added.
 
 # R installation
 devtools::install_github("https://github.com/fatihsaglam/ImbRegSamp")
