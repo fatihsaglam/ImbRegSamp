@@ -23,7 +23,7 @@ SMOTER(
 
 \item{thresh_rel}{threshold to determine rare values. Default is 0.5.}
 
-\item{phi}{Relevance values for each samples. Default is NULL. If NULL,
+\item{phi}{Relevance values for each sample. Default is NULL. If NULL,
 inverse of kernel density estimation is used.}
 
 \item{perc_ov_lower}{percentage of oversampling of lower rare samples. If
@@ -45,7 +45,7 @@ an list object which includes:
  \item{x_new}{SMOTEd feature matrix}
  \item{y_new}{SMOTEd target variable}
  \item{x_syn}{Synthetic feature matrix}
- \item{y_syn}{Synrhetic target variable}
+ \item{y_syn}{Synthetic target variable}
  \item{phi}{relevance function values for y}
  \item{y}{original y to be used to calculate new target values}
  \item{h}{bandwidth value used to calculate densities for relevance values}
