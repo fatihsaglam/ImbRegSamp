@@ -7,7 +7,7 @@ Implemented metrics are:
 
 1- WSSE (Weighted Sum of Squared Error)
 
-Implemented relevance functions:
+Implemented relevance functions are:
 
 1- PCHIP (Piecewise Cubic Hermite Interpolating Polynomials)
 
