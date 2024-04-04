@@ -13,7 +13,8 @@ SMOTER(
   perc_ov_upper = NULL,
   perc_un = NULL,
   k = 5,
-  method = "ucv"
+  rel_method = "PCHIP",
+  ...
 )
 }
 \arguments{
@@ -35,10 +36,11 @@ NULL, it is automatically determined by algorithm. Cannot be lower than 1.}
 \item{perc_un}{percentage of undersampling of non-rare samples. If NULL, it
 is automatically determined by algorithm. Cannot be higher than 1.}
 
-\item{k}{number of neighbors for links}
+\item{k}{number of neighbors for links.}
 
-\item{method}{bandwith estimation method used in relevance value calculation.
-Default is "ucv".}
+\item{rel_method}{method for relevance function. Default is "PCHIP".}
+
+\item{...}{relevance function settings.}
 }
 \value{
 an list object which includes:
@@ -48,7 +50,8 @@ an list object which includes:
  \item{y_syn}{Synthetic target variable}
  \item{phi}{relevance function values for y}
  \item{y}{original y to be used to calculate new target values}
- \item{h}{bandwidth value used to calculate densities for relevance values}
+ \item{rel_model}{Details about relevance function. Can be used to calculate
+ new relevance for test data.}
 }
 \description{
 \code{SMOTER} applies undersampling and oversampling to
@@ -56,14 +59,12 @@ imbalanced regression data sets.
 }
 \details{
 Despite its name, it can undersample and oversample imbalanced data sets. It is
-used to better estimate the rare values in regression. Algorithm is a little
-different to UBL package and more similar to original paper (Torgo et al., 2013).
-Relevance values are the inverse of kernel density estimations using unbiased
-cross-validation bandwidth.There are three classes: lower rare,
-not rare and upper rare. Lower rare class is samples that satisfy \eqn{\phi > treshold}
-and \eqn{y < \tilde{y}}. Upper rare class is samples that satisfy \eqn{\phi > treshold}
-and \eqn{y > \tilde{y}}. Other samples are considered as not rare.
-\eqn{\tilde{y}} is median of \eqn{y}.
+used to better estimate the rare values in regression. Algorithm is from
+Torgo et al. (2013). There are three classes: lower rare, not rare and upper
+rare. Lower rare class is samples that satisfy \eqn{\phi > treshold} and
+\eqn{y < \tilde{y}}. Upper rare class is samples that satisfy
+\eqn{\phi > treshold} and \eqn{y > \tilde{y}}. Other samples are considered
+as not rare. \eqn{\tilde{y}} is median of \eqn{y}.
 }
 \examples{
 x <- rnorm(100)

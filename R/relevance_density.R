@@ -6,7 +6,7 @@
 #' @param y_new new target values for calculating relevance values. Default is y.
 #' @param h bandwith value for kernel density estimation. Default is NULL. If
 #' NULL, it is estimated based on \code{method}.
-#' @param method method to be used in estimating bandwidth. Default is unbiased
+#' @param bw_method method to be used in estimating bandwidth. Default is unbiased
 #' cross validation.
 #'
 #' @details
@@ -35,15 +35,23 @@
 #' @rdname relevance_density
 #' @export
 
-relevance_density <- function(y, y_new = y, h = NULL, method = "ucv") {
-  match.arg(method, c("bcv", "nrd", "nrd0", "SJ", "ucv"))
-  if (is.null(h)) {
-    f_bw <- get(paste0("bw.", method))
-    h <- f_bw(y)
+relevance_density <-
+  function(y,
+           y_new = y,
+           h = NULL,
+           bw_method = "ucv") {
+    match.arg(bw_method, c("bcv", "nrd", "nrd0", "SJ", "ucv"))
+    if (is.null(h)) {
+      f_bw <- get(paste0("bw.", bw_method))
+      h <- f_bw(y)
+    }
+    dens <- kde(y, h = h, eval.points = y_new)$estimate
+    dens[dens <= 1e-10] <- 1e-10
+    rel <- 1 / dens
+    rel <-  (rel - min(rel)) / (max(rel) - min(rel))
+    return(list(
+      rel = rel,
+      rel_model = list(method = "density",
+                       pars = list(h = h))
+    ))
   }
-  dens <- kde(y, h = h, eval.points = y_new)$estimate
-  dens[dens <= 1e-10] <- 1e-10
-  rel <- 1/dens
-  return(list(rel = rel,
-              h = h))
-}

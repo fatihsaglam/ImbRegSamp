@@ -14,20 +14,18 @@
 #' NULL, it is automatically determined by algorithm. Cannot be lower than 1.
 #' @param perc_un percentage of undersampling of non-rare samples. If NULL, it
 #' is automatically determined by algorithm. Cannot be higher than 1.
-#' @param k number of neighbors for links
-#' @param method bandwith estimation method used in relevance value calculation.
-#' Default is "ucv".
+#' @param k number of neighbors for links.
+#' @param rel_method method for relevance function. Default is "PCHIP".
+#' @param ... relevance function settings.
 #'
 #' @details
 #' Despite its name, it can undersample and oversample imbalanced data sets. It is
-#' used to better estimate the rare values in regression. Algorithm is a little
-#' different to UBL package and more similar to original paper (Torgo et al., 2013).
-#' Relevance values are the inverse of kernel density estimations using unbiased
-#' cross-validation bandwidth.There are three classes: lower rare,
-#' not rare and upper rare. Lower rare class is samples that satisfy \eqn{\phi > treshold}
-#' and \eqn{y < \tilde{y}}. Upper rare class is samples that satisfy \eqn{\phi > treshold}
-#' and \eqn{y > \tilde{y}}. Other samples are considered as not rare.
-#' \eqn{\tilde{y}} is median of \eqn{y}.
+#' used to better estimate the rare values in regression. Algorithm is from
+#' Torgo et al. (2013). There are three classes: lower rare, not rare and upper
+#' rare. Lower rare class is samples that satisfy \eqn{\phi > treshold} and
+#' \eqn{y < \tilde{y}}. Upper rare class is samples that satisfy
+#' \eqn{\phi > treshold} and \eqn{y > \tilde{y}}. Other samples are considered
+#' as not rare. \eqn{\tilde{y}} is median of \eqn{y}.
 #'
 #' @return an list object which includes:
 #'  \item{x_new}{SMOTEd feature matrix}
@@ -36,7 +34,8 @@
 #'  \item{y_syn}{Synthetic target variable}
 #'  \item{phi}{relevance function values for y}
 #'  \item{y}{original y to be used to calculate new target values}
-#'  \item{h}{bandwidth value used to calculate densities for relevance values}
+#'  \item{rel_model}{Details about relevance function. Can be used to calculate
+#'  new relevance for test data.}
 #'
 #' @references
 #' Torgo, L., Ribeiro, R. P., Pfahringer, B., & Branco, P. (2013, September).
@@ -71,17 +70,21 @@ SMOTER <-
            perc_ov_upper = NULL,
            perc_un = NULL,
            k = 5,
-           method = "ucv") {
+           rel_method = "PCHIP",
+           ...) {
     data <- as.matrix(cbind(x, y))
     n <- nrow(data)
     p <- ncol(data) - 1
 
-    h <- NULL
     if (is.null(phi)) {
-      m_rel <- relevance_density(y = y, method = method)
-      h <- m_rel$h
+      f_rel <- get(paste0("relevance_", rel_method))
+      m_rel <- f_rel(y = y, ...)
       phi <- m_rel$rel
     } else {
+      m_rel <- list()
+      m_rel$rel_model <- list(
+        method = "manual"
+      )
       if (length(phi) != n) {
         stop("phi must be equal length to y")
       }
@@ -103,9 +106,6 @@ SMOTER <-
     n_rare_lower <- nrow(data_rare_lower)
     data_rare_upper <- data[i_rare_upper,]
     n_rare_upper <- nrow(data_rare_upper)
-
-    k_lower <- min(k, n_rare_lower - 1)
-    k_upper <- min(k, n_rare_upper - 1)
 
     n_effbump <- sum(n_notRare > 0,
                      n_rare_lower > 0,
@@ -166,6 +166,9 @@ SMOTER <-
     data_notRare_undersampled <-
       data_notRare[i_notRare_undersampled,]
 
+    k_lower <- min(k, n_rare_lower - 1)
+    k_upper <- min(k, n_rare_upper - 1)
+
     data_syn_lower <-
       generator_SMOTER(data_rare = data_rare_lower,
                        perc_ov = perc_ov_lower,
@@ -188,7 +191,7 @@ SMOTER <-
       x_syn = data_syn[, 1:p],
       y_syn = data_syn[, p + 1],
       phi = phi,
-      h = h
+      rel_model = m_rel$rel_model
     )
 
     return(results)

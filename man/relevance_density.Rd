@@ -4,7 +4,7 @@
 \alias{relevance_density}
 \title{Relevance function based on density}
 \usage{
-relevance_density(y, y_new = y, h = NULL, method = "ucv")
+relevance_density(y, y_new = y, h = NULL, bw_method = "ucv")
 }
 \arguments{
 \item{y}{target values.}
@@ -14,7 +14,7 @@ relevance_density(y, y_new = y, h = NULL, method = "ucv")
 \item{h}{bandwith value for kernel density estimation. Default is NULL. If
 NULL, it is estimated based on \code{method}.}
 
-\item{method}{method to be used in estimating bandwidth. Default is unbiased
+\item{bw_method}{method to be used in estimating bandwidth. Default is unbiased
 cross validation.}
 }
 \value{

@@ -41,7 +41,7 @@
 #' SSE_notweighted
 #'
 #' ### weights for test data
-#' m_rel <- relevance_density(y = y_train, y_new = y_test)
+#' m_rel <- relevance_PCHIP(y = y_train, y_new = y_test)
 #'
 #' ### weighted sum of squares
 #' SSE_weighted <- WSSE(truth = y_test, pred = pred_test, weight = m_rel$rel)
