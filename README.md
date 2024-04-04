@@ -10,6 +10,7 @@ Implemented metrics are:
 Implemented relevance functions:
 
 1- PCHIP (Piecewise Cubic Hermite Interpolating Polynomials)
+
 2- Inverse Kernel Density Estimation
 
 More methods will be added.
