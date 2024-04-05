@@ -28,7 +28,7 @@ generator_SMOTER <- function(data_rare, perc_ov, k) {
 
   n_syn <- round((perc_ov - 1) * n_rare)
 
-  NN_rare2rare <- get.knn(data_rare[,1:p], k = k)$nn.index
+  NN_rare2rare <- get.knn(data_rare[,1:p_rare], k = k)$nn.index
   C <- rep(floor(n_syn / n_rare), n_rare)
   n_needed <- n_syn - sum(C)
   ii <- sample(1:n_rare, n_needed)

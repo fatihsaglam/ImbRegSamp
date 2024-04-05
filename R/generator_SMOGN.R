@@ -1,3 +1,26 @@
+#' @title Data Generation Algorithm of SMOGN
+#'
+#' @description Generation of data in SMOGN algorithm.
+#'
+#' @param data_rare rare dataset.
+#' @param perc_ov percentage of oversampling.
+#' @param k number of nearest neighbors.
+#' @param pert coefficient for noise variances.
+#'
+#' @details
+#' To be used inside SMOGN to generate data when oversampling.
+#'
+#' @return a matrix of oversampled data.
+#'
+#' @author Fatih Sağlam, saglamf89@gmail.com
+#'
+#' @importFrom FNN get.knn
+#' @importFrom Rfast dista
+#' @importFrom Rfast Dist
+#' @importFrom stats runif
+#'
+#' @noRd
+
 generator_SMOGN <- function(data_rare, perc_ov, k, pert = 0.02) {
   n_rare <- nrow(data_rare)
   p_rare <- ncol(data_rare) - 1
@@ -7,7 +30,7 @@ generator_SMOGN <- function(data_rare, perc_ov, k, pert = 0.02) {
 
   n_syn <- round((perc_ov - 1) * n_rare)
 
-  m_NN_rare2rare <- get.knn(data = data_rare[,1:p], k = k)
+  m_NN_rare2rare <- get.knn(data = data_rare[,1:p_rare], k = k)
   i_NN_rare2rare <- m_NN_rare2rare$nn.index
   d_NN_rare2rare <- m_NN_rare2rare$nn.dist
   d_rare2rare <- Dist(data_rare)
@@ -36,7 +59,7 @@ generator_SMOGN <- function(data_rare, perc_ov, k, pert = 0.02) {
         syn <- center + r * (target - center)
       } else {
         pert <- min(maxD[i], pert)
-        syn <- center + rnorm(n = p + 1, mean = 0, sd = sds*pert)
+        syn <- center + rnorm(n = p_rare + 1, mean = 0, sd = sds*pert)
       }
 
       data_syn <- rbind(data_syn,
