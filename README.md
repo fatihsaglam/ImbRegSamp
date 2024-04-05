@@ -1,14 +1,14 @@
----
-bibliography: references.bib
----
-
 # ImbRegSamp
 
-Sampling methods for imbalanced regression. Implemented resampling methods are:
+Sampling methods for imbalanced regression. Implemented resampling
+methods are:
 
-1- [SMOTER](https://link.springer.com/chapter/10.1007/978-3-642-40669-0_33) [@10.1007/978-3-642-40669-0_33]
+1-
+[SMOTER](https://link.springer.com/chapter/10.1007/978-3-642-40669-0_33)
+(Luís Torgo et al. 2013)
 
-2- [SMOGN](https://proceedings.mlr.press/v74/branco17a) [@pmlr-v74-branco17a]
+2- [SMOGN](https://proceedings.mlr.press/v74/branco17a) (Branco, Torgo,
+and Ribeiro 2017)
 
 Implemented metrics are:
 
@@ -22,14 +22,39 @@ Implemented metrics are:
 
 Implemented relevance functions are:
 
-1- PCHIP (Piecewise Cubic Hermite Interpolating Polynomials) [@torgo2007utility]
+1- PCHIP (Piecewise Cubic Hermite Interpolating Polynomials) (Luis Torgo
+and Ribeiro 2007)
 
-2- [Inverse Kernel Density Estimation](https://link.springer.com/article/10.1007/s10994-021-06023-5) [@steininger2021]
+2- [Inverse Kernel Density
+Estimation](https://link.springer.com/article/10.1007/s10994-021-06023-5)
+(Steininger et al. 2021)
 
 More methods will be added.
 
 # R installation
 
-devtools::install_github("<https://github.com/fatihsaglam/ImbRegSamp>")
+devtools::install_github(“<https://github.com/fatihsaglam/ImbRegSamp>”)
 
 # References
+
+Branco, Paula, Luís Torgo, and Rita P. Ribeiro. 2017. “SMOGN: A
+Pre-Processing Approach for Imbalanced Regression.” In *Proceedings of
+the First International Workshop on Learning with Imbalanced Domains:
+Theory and Applications*, edited by Paula Branco Luís Torgo and Nuno
+Moniz, 74:36–50. Proceedings of Machine Learning Research. PMLR.
+<https://proceedings.mlr.press/v74/branco17a.html>.
+
+Steininger, Michael, Konstantin Kobs, Padraig Davidson, Anna Krause, and
+Andreas Hotho. 2021. “Density-Based Weighting for Imbalanced
+Regression.” *Machine Learning* 110 (8): 2187–2211.
+<https://doi.org/10.1007/s10994-021-06023-5>.
+
+Torgo, Luis, and Rita Ribeiro. 2007. “Utility-Based Regression.” In
+*Knowledge Discovery in Databases: PKDD 2007: 11th European Conference
+on Principles and Practice of Knowledge Discovery in Databases, Warsaw,
+Poland, September 17-21, 2007. Proceedings 11*, 597–604. Springer.
+
+Torgo, Luís, Rita P. Ribeiro, Bernhard Pfahringer, and Paula Branco.
+2013. “SMOTE for Regression.” In *Progress in Artificial Intelligence*,
+edited by Luís Correia, Luís Paulo Reis, and José Cascalho, 378–89.
+Berlin, Heidelberg: Springer Berlin Heidelberg.
