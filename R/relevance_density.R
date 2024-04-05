@@ -12,7 +12,7 @@
 #' @details
 #' \code{relevance_density} is a relevance function. It is used to determine
 #' rare and not rare values in a regression problem. It calculates kernel densities
-#' and inverse of densities are considered relevance values.
+#' and inverse of densities are considered relevance values (Steininger et al., 2021).
 #'
 #' @return a vector of relevance values.
 #'
@@ -21,6 +21,11 @@
 #' @importFrom ks kde
 #' @import stats
 #' @importFrom methods getFunction
+#'
+#' @references
+#' Steininger, M., Kobs, K., Davidson, P., Krause, A., & Hotho, A. (2021).
+#' Density-based weighting for imbalanced regression. Machine Learning, 110,
+#' 2187-2211.
 #'
 #' @examples
 #'
@@ -39,16 +44,18 @@ relevance_density <-
   function(y,
            y_new = y,
            h = NULL,
-           bw_method = "ucv") {
+           alpha = 1,
+           bw_method = "ucv",
+           epsilon = 1e-10) {
     match.arg(bw_method, c("bcv", "nrd", "nrd0", "SJ", "ucv"))
     if (is.null(h)) {
       f_bw <- get(paste0("bw.", bw_method))
       h <- f_bw(y)
     }
     dens <- kde(y, h = h, eval.points = y_new)$estimate
-    dens[dens <= 1e-10] <- 1e-10
-    rel <- 1 / dens
-    rel <-  (rel - min(rel)) / (max(rel) - min(rel))
+    dens_scaled <- (dens - min(dens)) / (max(dens) - min(dens))
+    rel <- max(1 - alpha*dens, epsilon)
+
     return(list(
       rel = rel,
       rel_model = list(method = "density",

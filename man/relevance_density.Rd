@@ -4,7 +4,14 @@
 \alias{relevance_density}
 \title{Relevance function based on density}
 \usage{
-relevance_density(y, y_new = y, h = NULL, bw_method = "ucv")
+relevance_density(
+  y,
+  y_new = y,
+  h = NULL,
+  alpha = 1,
+  bw_method = "ucv",
+  epsilon = 1e-10
+)
 }
 \arguments{
 \item{y}{target values.}
@@ -26,7 +33,7 @@ Relevance value generation using kernel density estimation
 \details{
 \code{relevance_density} is a relevance function. It is used to determine
 rare and not rare values in a regression problem. It calculates kernel densities
-and inverse of densities are considered relevance values.
+and inverse of densities are considered relevance values (Steininger et al., 2021).
 }
 \examples{
 
@@ -38,6 +45,11 @@ y <- 2 + x^2 + err
 ### relevance values
 rel <- relevance_density(y)
 
+}
+\references{
+Steininger, M., Kobs, K., Davidson, P., Krause, A., & Hotho, A. (2021).
+Density-based weighting for imbalanced regression. Machine Learning, 110,
+2187-2211.
 }
 \author{
 Fatih Sağlam, saglamf89@gmail.com
