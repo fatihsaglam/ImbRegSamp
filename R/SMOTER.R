@@ -15,11 +15,12 @@
 #' @param perc_un percentage of undersampling of non-rare samples. If NULL, it
 #' is automatically determined by algorithm. Cannot be higher than 1.
 #' @param k number of neighbors for links.
-#' @param rel_method method for relevance function. Default is "PCHIP".
+#' @param rel_method method for relevance function. Default is "PCHIP". Choices
+#' are "PCHIP" and "density".
 #' @param ... relevance function settings.
 #'
 #' @details
-#' Despite its name, it can undersample and oversample imbalanced data sets. It is
+#' Despite its name, it can both undersample and oversample imbalanced data sets. It is
 #' used to better estimate the rare values in regression. Algorithm is from
 #' Torgo et al. (2013). There are three classes: lower rare, not rare and upper
 #' rare. Lower rare class is samples that satisfy \eqn{\phi > treshold} and
@@ -28,12 +29,15 @@
 #' as not rare. \eqn{\tilde{y}} is median of \eqn{y}.
 #'
 #' @return an list object which includes:
-#'  \item{x_new}{SMOTEd feature matrix}
-#'  \item{y_new}{SMOTEd target variable}
+#'  \item{x_new}{Balanced feature matrix}
+#'  \item{y_new}{Balanced target variable}
+#'  \item{groups_new}{categories of new data}
+#'  \item{x_original}{original feature matrix}
+#'  \item{y_original}{original target variable}
+#'  \item{groups_original}{categories of original data}
 #'  \item{x_syn}{Synthetic feature matrix}
 #'  \item{y_syn}{Synthetic target variable}
 #'  \item{phi}{relevance function values for y}
-#'  \item{y}{original y to be used to calculate new target values}
 #'  \item{rel_model}{Details about relevance function. Can be used to calculate
 #'  new relevance for test data.}
 #'
@@ -96,9 +100,9 @@ SMOTER <-
       }
     }
 
-    i_rare_lower <- which(phi > thresh_rel & y < median(y))
-    i_rare_upper <- which(phi > thresh_rel & y > median(y))
-    i_notRare <- which(phi <= thresh_rel)
+    i_rare_lower <- (phi > thresh_rel & y < median(y))
+    i_rare_upper <- (phi > thresh_rel & y > median(y))
+    i_notRare <- (phi <= thresh_rel)
 
     data_notRare <- data[i_notRare, ]
     n_notRare <- nrow(data_notRare)
@@ -161,10 +165,12 @@ SMOTER <-
       "\n"
     )
 
+    ### undersampling ###
     i_notRare_undersampled <-
       sample(1:n_notRare, round(n_notRare * perc_un))
     data_notRare_undersampled <-
       data_notRare[i_notRare_undersampled,]
+    ### undersampling finished ###
 
     k_lower <- min(k, n_rare_lower - 1)
     k_upper <- min(k, n_rare_upper - 1)
@@ -181,13 +187,35 @@ SMOTER <-
     data_syn <- rbind(data_syn_lower,
                       data_syn_upper)
     data_new <- rbind(data_notRare_undersampled,
-                      data_syn,
+                      data_syn_lower,
+                      data_syn_upper,
                       data_rare_lower,
                       data_rare_upper)
+    groups_new <- c(rep("notRare_undersampled", nrow(data_notRare_undersampled)),
+                    rep("syn_lower", nrow(data_syn_lower)),
+                    rep("syn_upper", nrow(data_syn_upper)),
+                    rep("rare_lower", nrow(data_rare_lower)),
+                    rep("rare_upper", nrow(data_rare_upper)))
+    groups_new <- as.factor(groups_new)
+
+    data_original <- rbind(
+      data_notRare,
+      data_rare_lower,
+      data_rare_upper
+    )
+
+    groups_original <- c(rep("notRare", nrow(data_notRare)),
+                         rep("rare_lower", nrow(data_rare_lower)),
+                         rep("rare_upper", nrow(data_rare_upper)))
+    groups_original <- as.factor(groups_original)
 
     results <- list(
       x_new = data_new[, 1:p],
       y_new = data_new[, p + 1],
+      groups_new = groups_new,
+      x_original = data_original[, 1:p],
+      y_original = data_original[, p + 1],
+      groups_original = groups_original,
       x_syn = data_syn[, 1:p],
       y_syn = data_syn[, p + 1],
       phi = phi,

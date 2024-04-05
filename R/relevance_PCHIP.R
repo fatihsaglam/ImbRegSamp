@@ -53,7 +53,7 @@ relevance_PCHIP <-
     if (is.null(S_points)) {
       IQR <- IQR(y)
       S_points <-
-        quantile(as.numeric(y), c(0.25, 0.5, 0.75)) + c(-IQR * coef, 0, IQR * coef)
+        quantile(y, c(0.25, 0.5, 0.75)) + c(-IQR * coef, 0, IQR * coef)
     }
     if (is.null(S_phi)) {
       S_phi <-
@@ -109,6 +109,7 @@ relevance_PCHIP <-
     phi <- a[ii] + b[ii] * diffs + c[ii] * diffs ^ 2 + d[ii] * diffs ^ 3
     phi[y_new < S_points[1]] <- 1
     phi[y_new > S_points[3]] <- 1
+    phi <- unname(phi)
 
     return(list(
       rel = phi,
