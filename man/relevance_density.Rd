@@ -21,8 +21,13 @@ relevance_density(
 \item{h}{bandwith value for kernel density estimation. Default is NULL. If
 NULL, it is estimated based on \code{method}.}
 
+\item{alpha}{coefficient of density. Takes value in \eqn{(0,\infty)}. Higher
+values mean less rare values. Lower values mean more rare values. Default is 1.}
+
 \item{bw_method}{method to be used in estimating bandwidth. Default is unbiased
 cross validation.}
+
+\item{epsilon}{the lowest possible relevance value. Default is \eqn{1e-10}.}
 }
 \value{
 a vector of relevance values.

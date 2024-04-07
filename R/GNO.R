@@ -1,6 +1,6 @@
-#' @title SMOGN
+#' @title Gaussian Noise Oversampling
 #'
-#' @description \code{SMOGN} applies undersampling and oversampling to
+#' @description \code{GNO} applies undersampling and oversampling to
 #' imbalanced regression data sets.
 #'
 #' @param x feature matrix or dataframe. Only numeric variables for now.
@@ -14,18 +14,17 @@
 #' NULL, it is automatically determined by algorithm. Cannot be lower than 1.
 #' @param perc_un percentage of undersampling of non-rare samples. If NULL, it
 #' is automatically determined by algorithm. Cannot be higher than 1.
-#' @param k number of neighbors for links.
 #' @param rel_method method for relevance function. Default is "PCHIP". Choices
 #' are "PCHIP" and "density". Ignored if phi is given.
 #' @param pert effects the variance of noises. Default is 0.02, same as the paper
-#' (Branco et al., 2017).
+#' (Branco et al., 2019).
 #' @param ... relevance function settings.
 #'
 #' @details
-#' SMOGN (Branco et al., 2017) generates synthetic data sometimes SMOTE-like
-#' and sometimes by adding Gaussian noise. It compares the length of link to the
-#' median distance to other rare samples. If the first is higher, SMOGN generates
-#' by adding noise. If the second is higher, it generates sample on the link.
+#' GNO (Branco et al., 2019) generates synthetic data by adding Gaussian noise.
+#' It compares the length of link to the median distance to other rare samples.
+#' If the first is higher, SMOGN generates by adding noise. If the second is
+#' higher, it generates sample on the link.
 #'
 #' @return an list object which includes:
 #'  \item{x_new}{Balanced feature matrix}
@@ -41,10 +40,9 @@
 #'  new relevance for test data.}
 #'
 #' @references
-#' Branco, P., Torgo, L., & Ribeiro, R. P. (2017, October). SMOGN: a
-#' pre-processing approach for imbalanced regression. In First international
-#' workshop on learning with imbalanced domains: Theory and applications
-#' (pp. 36-50). PMLR.
+#' Branco, Paula, Luis Torgo, and Rita P. Ribeiro. 2019. "Pre-Processing
+#' Approaches for Imbalanced Distributions in Regression." Neurocomputing
+#' 343: 76–99. https://doi.org/https://doi.org/10.1016/j.neucom.2018.11.100.
 #'
 #' @author Fatih Sağlam, saglamf89@gmail.com
 #'
@@ -53,21 +51,20 @@
 #' err <- rnorm(100)
 #' y <- 2 + x^2 + err
 #'
-#' m_SMOGN <- SMOGN(x = x, y = y)
+#' m_GNO <- GNO(x = x, y = y)
 #'
 #' plot(x, y)
-#' plot(m_SMOGN$x_new, m_SMOGN$y_new)
+#' plot(m_GNO$x_new, m_GNO$y_new)
 #'
 #' @importFrom stats median
 #'
-#' @rdname SMOGN
+#' @rdname GNO
 #' @export
 
-SMOGN <- function(x,
+GNO <- function(x,
                   y,
                   phi = NULL,
                   thresh_rel = 0.5,
-                  k = 5,
                   perc_ov_lower = NULL,
                   perc_ov_upper = NULL,
                   perc_un = NULL,
@@ -162,7 +159,6 @@ SMOGN <- function(x,
     "\n"
   )
 
-
   ### undersampling ###
   i_notRare_undersampled <-
     sample(1:n_notRare, round(n_notRare * perc_un))
@@ -170,17 +166,12 @@ SMOGN <- function(x,
     data_notRare[i_notRare_undersampled,]
   ### undersampling finished ###
 
-  k_lower <- min(k, n_rare_lower - 1)
-  k_upper <- min(k, n_rare_upper - 1)
-
   data_syn_lower <-
-    generator_SMOGN(data_rare = data_rare_lower,
-                     perc_ov = perc_ov_lower,
-                     k = k_lower, pert = pert)
+    generator_GNO(data_rare = data_rare_lower,
+                    perc_ov = perc_ov_lower, pert = pert)
   data_syn_upper <-
-    generator_SMOGN(data_rare = data_rare_upper,
-                     perc_ov = perc_ov_upper,
-                     k = k_upper, pert = pert)
+    generator_GNO(data_rare = data_rare_upper,
+                    perc_ov = perc_ov_upper, pert = pert)
 
   data_syn <- rbind(data_syn_lower,
                     data_syn_upper)

@@ -10,6 +10,12 @@ methods are:
 2- [SMOGN](https://proceedings.mlr.press/v74/branco17a) (Branco, Torgo,
 and Ribeiro 2017)
 
+3- Random over-under sampling
+
+4- WERSC (Branco, Torgo, and Ribeiro 2019)
+
+5- GNO (Gaussian Noise Oversampling) (Branco, Torgo, and Ribeiro 2019)
+
 Implemented metrics are:
 
 1- WSSE (weighted sum of squared error)
@@ -36,6 +42,11 @@ More methods will be added.
 devtools::install_github(“<https://github.com/fatihsaglam/ImbRegSamp>”)
 
 # References
+
+Branco, Paula, Luis Torgo, and Rita P. Ribeiro. 2019. “Pre-Processing
+Approaches for Imbalanced Distributions in Regression.” *Neurocomputing*
+343: 76–99.
+https://doi.org/<https://doi.org/10.1016/j.neucom.2018.11.100>.
 
 Branco, Paula, Luís Torgo, and Rita P. Ribeiro. 2017. “SMOGN: A
 Pre-Processing Approach for Imbalanced Regression.” In *Proceedings of

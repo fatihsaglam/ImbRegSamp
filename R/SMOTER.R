@@ -16,7 +16,7 @@
 #' is automatically determined by algorithm. Cannot be higher than 1.
 #' @param k number of neighbors for links.
 #' @param rel_method method for relevance function. Default is "PCHIP". Choices
-#' are "PCHIP" and "density".
+#' are "PCHIP" and "density". Ignored if phi is given.
 #' @param ... relevance function settings.
 #'
 #' @details

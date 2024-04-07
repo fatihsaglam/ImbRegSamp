@@ -6,8 +6,11 @@
 #' @param y_new new target values for calculating relevance values. Default is y.
 #' @param h bandwith value for kernel density estimation. Default is NULL. If
 #' NULL, it is estimated based on \code{method}.
+#' @param alpha coefficient of density. Takes value in \eqn{(0,\infty)}. Higher
+#' values mean less rare values. Lower values mean more rare values. Default is 1.
 #' @param bw_method method to be used in estimating bandwidth. Default is unbiased
 #' cross validation.
+#' @param epsilon the lowest possible relevance value. Default is \eqn{1e-10}.
 #'
 #' @details
 #' \code{relevance_density} is a relevance function. It is used to determine

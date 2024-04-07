@@ -1,6 +1,6 @@
-#' @title SMOGN
+#' @title WERCS
 #'
-#' @description \code{SMOGN} applies undersampling and oversampling to
+#' @description \code{WERCS} applies weighted undersampling and oversampling to
 #' imbalanced regression data sets.
 #'
 #' @param x feature matrix or dataframe. Only numeric variables for now.
@@ -14,18 +14,13 @@
 #' NULL, it is automatically determined by algorithm. Cannot be lower than 1.
 #' @param perc_un percentage of undersampling of non-rare samples. If NULL, it
 #' is automatically determined by algorithm. Cannot be higher than 1.
-#' @param k number of neighbors for links.
 #' @param rel_method method for relevance function. Default is "PCHIP". Choices
 #' are "PCHIP" and "density". Ignored if phi is given.
-#' @param pert effects the variance of noises. Default is 0.02, same as the paper
-#' (Branco et al., 2017).
 #' @param ... relevance function settings.
 #'
 #' @details
-#' SMOGN (Branco et al., 2017) generates synthetic data sometimes SMOTE-like
-#' and sometimes by adding Gaussian noise. It compares the length of link to the
-#' median distance to other rare samples. If the first is higher, SMOGN generates
-#' by adding noise. If the second is higher, it generates sample on the link.
+#' WERSC (Branco et al., 2019) is similar to random sampling but sampling is conducted as biased random
+#' weighted by \eqn{1 - \phi}.
 #'
 #' @return an list object which includes:
 #'  \item{x_new}{Balanced feature matrix}
@@ -40,48 +35,49 @@
 #'  \item{rel_model}{Details about relevance function. Can be used to calculate
 #'  new relevance for test data.}
 #'
-#' @references
-#' Branco, P., Torgo, L., & Ribeiro, R. P. (2017, October). SMOGN: a
-#' pre-processing approach for imbalanced regression. In First international
-#' workshop on learning with imbalanced domains: Theory and applications
-#' (pp. 36-50). PMLR.
-#'
 #' @author Fatih Sağlam, saglamf89@gmail.com
+#'
+#' @references
+#' Branco, Paula, Luis Torgo, and Rita P. Ribeiro. 2019. "Pre-Processing
+#' Approaches for Imbalanced Distributions in Regression." Neurocomputing
+#' 343: 76–99. https://doi.org/https://doi.org/10.1016/j.neucom.2018.11.100.
 #'
 #' @examples
 #' x <- rnorm(100)
 #' err <- rnorm(100)
 #' y <- 2 + x^2 + err
 #'
-#' m_SMOGN <- SMOGN(x = x, y = y)
+#' m_WERCS <- WERCS(x = x, y = y)
 #'
 #' plot(x, y)
-#' plot(m_SMOGN$x_new, m_SMOGN$y_new)
+#' plot(m_WERCS$x_new, m_WERCS$y_new)
 #'
 #' @importFrom stats median
 #'
-#' @rdname SMOGN
+#' @rdname WERCS
 #' @export
 
-SMOGN <- function(x,
-                  y,
-                  phi = NULL,
-                  thresh_rel = 0.5,
-                  k = 5,
-                  perc_ov_lower = NULL,
-                  perc_ov_upper = NULL,
-                  perc_un = NULL,
-                  rel_method = "PCHIP",
-                  pert = 0.02,
-                  ...) {
+WERCS <- function(x,
+                 y,
+                 phi = NULL,
+                 thresh_rel = 0.5,
+                 perc_ov_lower = NULL,
+                 perc_ov_upper = NULL,
+                 perc_un = NULL,
+                 rel_method = "PCHIP",
+                 ...) {
 
   data <- as.matrix(cbind(x, y))
   n <- nrow(data)
   p <- ncol(data) - 1
 
+  i_order_y <- order(y)
+  data_ordered <- data[i_order_y,]
+  y_ordered <- y[i_order_y]
+
   if (is.null(phi)) {
     f_rel <- get(paste0("relevance_", rel_method))
-    m_rel <- f_rel(y = y, ...)
+    m_rel <- f_rel(y = y)
     phi <- m_rel$rel
   } else {
     if (length(phi) != n) {
@@ -109,7 +105,6 @@ SMOGN <- function(x,
   n_effbump <- sum(n_notRare > 0,
                    n_rare_lower > 0,
                    n_rare_upper > 0)
-
 
   if (is.null(perc_ov_lower)) {
     perc_ov_lower <- n / n_effbump / n_rare_lower
@@ -162,25 +157,19 @@ SMOGN <- function(x,
     "\n"
   )
 
-
   ### undersampling ###
   i_notRare_undersampled <-
-    sample(1:n_notRare, round(n_notRare * perc_un))
+    sample(1:n_notRare, round(n_notRare * perc_un), prob = phi[i_notRare] + 1e-10)
   data_notRare_undersampled <-
     data_notRare[i_notRare_undersampled,]
   ### undersampling finished ###
 
-  k_lower <- min(k, n_rare_lower - 1)
-  k_upper <- min(k, n_rare_upper - 1)
-
   data_syn_lower <-
-    generator_SMOGN(data_rare = data_rare_lower,
-                     perc_ov = perc_ov_lower,
-                     k = k_lower, pert = pert)
+    generator_WERCS(data_rare = data_rare_lower,
+                  perc_ov = perc_ov_lower, phi = phi[i_rare_lower])
   data_syn_upper <-
-    generator_SMOGN(data_rare = data_rare_upper,
-                     perc_ov = perc_ov_upper,
-                     k = k_upper, pert = pert)
+    generator_WERCS(data_rare = data_rare_upper,
+                  perc_ov = perc_ov_upper, phi = phi[i_rare_upper])
 
   data_syn <- rbind(data_syn_lower,
                     data_syn_upper)
@@ -220,5 +209,5 @@ SMOGN <- function(x,
     rel_model = m_rel$rel_model
   )
 
-  return(results)
+
 }

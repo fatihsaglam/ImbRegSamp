@@ -9,7 +9,7 @@
 #' @details
 #' To be used inside SMOTER to generate data when oversampling.
 #'
-#' @return a matrix of oversampled data.
+#' @return oversampled data.
 #'
 #' @author Fatih Sağlam, saglamf89@gmail.com
 #'

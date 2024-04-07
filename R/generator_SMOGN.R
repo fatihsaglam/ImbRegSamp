@@ -10,7 +10,7 @@
 #' @details
 #' To be used inside SMOGN to generate data when oversampling.
 #'
-#' @return a matrix of oversampled data.
+#' @return oversampled data.
 #'
 #' @author Fatih Sağlam, saglamf89@gmail.com
 #'
@@ -58,8 +58,7 @@ generator_SMOGN <- function(data_rare, perc_ov, k, pert = 0.02) {
         r <- runif(1)
         syn <- center + r * (target - center)
       } else {
-        pert <- min(maxD[i], pert)
-        syn <- center + rnorm(n = p_rare + 1, mean = 0, sd = sds*pert)
+        syn <- center + rnorm(n = p_rare + 1, mean = 0, sd = sds*min(maxD[i], pert))
       }
 
       data_syn <- rbind(data_syn,
