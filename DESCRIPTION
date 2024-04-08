@@ -6,7 +6,11 @@ Authors@R:
         c(person("Fatih", "Saglam", email = "saglamf89@gmail.com", 
         role = c("aut", "cre"), 
         comment = c(ORCID = "0000-0002-2084-2008")))
-Description: Resamples imbalanced datasets to better estimate rare values in regression.
+Description: Includes various methods for imbalanced regression. Resampling 
+    methods are used to balance data set by oversampling and/or undersampling. 
+    Alternative metrics are used to evaluate models when specific samples are rare.
+    Relevance function methods that are used to determine rare samples also included
+    in the package.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

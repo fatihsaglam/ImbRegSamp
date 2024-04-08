@@ -1,6 +1,6 @@
-#' @title Gaussian Noise Oversampling
+#' @title Gaussian Noise Oversampling for Regression
 #'
-#' @description \code{GNO} applies undersampling and oversampling to
+#' @description \code{GNOR} applies undersampling and oversampling to
 #' imbalanced regression data sets.
 #'
 #' @param x feature matrix or dataframe. Only numeric variables for now.
@@ -15,13 +15,13 @@
 #' @param perc_un percentage of undersampling of non-rare samples. If NULL, it
 #' is automatically determined by algorithm. Cannot be higher than 1.
 #' @param rel_method method for relevance function. Default is "PCHIP". Choices
-#' are "PCHIP" and "density". Ignored if phi is given.
+#' are "PCHIP" and "density". IGNORred if phi is given.
 #' @param pert effects the variance of noises. Default is 0.02, same as the paper
 #' (Branco et al., 2019).
 #' @param ... relevance function settings.
 #'
 #' @details
-#' GNO (Branco et al., 2019) generates synthetic data by adding Gaussian noise.
+#' GNOR (Branco et al., 2019) generates synthetic data by adding Gaussian noise.
 #' It compares the length of link to the median distance to other rare samples.
 #' If the first is higher, SMOGN generates by adding noise. If the second is
 #' higher, it generates sample on the link.
@@ -51,17 +51,17 @@
 #' err <- rnorm(100)
 #' y <- 2 + x^2 + err
 #'
-#' m_GNO <- GNO(x = x, y = y)
+#' m_GNOR <- GNOR(x = x, y = y)
 #'
 #' plot(x, y)
-#' plot(m_GNO$x_new, m_GNO$y_new)
+#' plot(m_GNOR$x_new, m_GNOR$y_new)
 #'
 #' @importFrom stats median
 #'
-#' @rdname GNO
+#' @rdname GNOR
 #' @export
 
-GNO <- function(x,
+GNOR <- function(x,
                   y,
                   phi = NULL,
                   thresh_rel = 0.5,
@@ -167,10 +167,10 @@ GNO <- function(x,
   ### undersampling finished ###
 
   data_syn_lower <-
-    generator_GNO(data_rare = data_rare_lower,
+    generator_GNOR(data_rare = data_rare_lower,
                     perc_ov = perc_ov_lower, pert = pert)
   data_syn_upper <-
-    generator_GNO(data_rare = data_rare_upper,
+    generator_GNOR(data_rare = data_rare_upper,
                     perc_ov = perc_ov_upper, pert = pert)
 
   data_syn <- rbind(data_syn_lower,

@@ -23,6 +23,8 @@ Sampling methods for imbalanced regression. Implemented resampling methods are:
 
 5- GNO (Gaussian Noise Oversampling) [@BRANCO201976]
 
+6- GSMOTER (Geometric SMOTE for Regression) [@CAMACHO2022116387]
+
 Implemented metrics are:
 
 1- WSSE (weighted sum of squared error)

@@ -1,13 +1,13 @@
-#' @title Data Generation Algorithm of GNO
+#' @title Data Generation Algorithm of GNOR
 #'
-#' @description Generation of data in GNO algorithm.
+#' @description Generation of data in GNOR algorithm.
 #'
 #' @param data_rare rare dataset.
 #' @param perc_ov percentage of oversampling.
 #' @param pert coefficient for noise variances.
 #'
 #' @details
-#' To be used inside GNO to generate data when oversampling.
+#' To be used inside GNOR to generate data when oversampling.
 #'
 #' @return oversampled data.
 #'
@@ -15,7 +15,7 @@
 #'
 #' @noRd
 
-generator_GNO <- function(data_rare, perc_ov, pert = 0.02) {
+generator_GNOR <- function(data_rare, perc_ov, pert = 0.02) {
   n_rare <- nrow(data_rare)
   p_rare <- ncol(data_rare) - 1
   if (n_rare == 0) {

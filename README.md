@@ -16,6 +16,9 @@ and Ribeiro 2017)
 
 5- GNO (Gaussian Noise Oversampling) (Branco, Torgo, and Ribeiro 2019)
 
+6- GSMOTER (Geometric SMOTE for Regression) (Camacho, Douzas, and Bacao
+2022)
+
 Implemented metrics are:
 
 1- WSSE (weighted sum of squared error)
@@ -54,6 +57,10 @@ the First International Workshop on Learning with Imbalanced Domains:
 Theory and Applications*, edited by Paula Branco Luís Torgo and Nuno
 Moniz, 74:36–50. Proceedings of Machine Learning Research. PMLR.
 <https://proceedings.mlr.press/v74/branco17a.html>.
+
+Camacho, Luís, Georgios Douzas, and Fernando Bacao. 2022. “Geometric
+SMOTE for Regression.” *Expert Systems with Applications* 193: 116387.
+https://doi.org/<https://doi.org/10.1016/j.eswa.2021.116387>.
 
 Steininger, Michael, Konstantin Kobs, Padraig Davidson, Anna Krause, and
 Andreas Hotho. 2021. “Density-Based Weighting for Imbalanced
