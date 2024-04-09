@@ -26,7 +26,7 @@ generator_WERCS <- function(data_rare, perc_ov, phi) {
 
   C <- rep(floor(n_syn / n_rare), n_rare)
   n_needed <- n_syn - sum(C)
-  ii <- sample(1:n_rare, n_needed, prob = 1 - phi)
+  ii <- sample(1:n_rare, n_needed, prob = pmax(1 - phi, 1e-6))
   C[ii] <- C[ii] + 1
 
   i_selected <- unlist(sapply(1:n_rare, function(m) {
