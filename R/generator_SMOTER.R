@@ -52,6 +52,9 @@ generator_SMOTER <- function(data_rare, perc_ov, k) {
     y_target <- target[, p_rare + 1]
 
     y_syn_new <- (d1 * y_target + d2 * y_center) / (d1 + d2)
+
+    y_syn_new[(d1 + d2) == 0] <- y_syn_old[(d1 + d2) == 0]
+
     syn[, p_rare + 1] <- y_syn_new
 
     data_syn <- rbind(data_syn,
