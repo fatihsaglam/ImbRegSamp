@@ -59,6 +59,10 @@ analyzeImbalance <- function(
     m_rel <- f_rel(y = y, ...)
     phi <- m_rel$rel
   } else {
+    m_rel <- list()
+    m_rel$rel_model <- list(
+      method = "manual"
+    )
     if (length(phi) != n) {
       stop("phi must be equal length to y")
     }
