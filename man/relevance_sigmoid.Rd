@@ -10,7 +10,7 @@ relevance_sigmoid(
   coef = 1.5,
   adj_points = NULL,
   delta = 1e-04,
-  k = 0.1
+  k = 0.5
 )
 }
 \arguments{

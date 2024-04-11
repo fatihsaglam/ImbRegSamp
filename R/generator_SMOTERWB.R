@@ -76,7 +76,7 @@ generator_SMOTERWB <- function(data_rare,
   y_notnoise <- c(rep(class_rare, n_rare_notnoise),
                   rep(class_notRare, n_notRare_notnoise))
 
-  k_max <- min(k_max, n_rare - 1)
+  k_max <- min(k_max, nrow(data_notnoise) - 1)
   NN <-
     knnx.index(data = data_notnoise[, 1:p_rare, drop = FALSE],
                query = data_rare[, 1:p_rare, drop = FALSE],
