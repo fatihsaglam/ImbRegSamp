@@ -98,7 +98,7 @@ WMSE <- function(truth, pred, weight = NULL) {
     weight <- weight/sum(weight)*length(truth)
   }
 
-  mean((truth - pred)^2*weight)
+  sum((truth - pred)^2*weight)/sum(weight)
 }
 
 #'
@@ -116,7 +116,7 @@ WMAD <- function(truth, pred, weight = NULL) {
     weight <- weight/sum(weight)*length(truth)
   }
 
-  mean(abs(truth - pred)*weight)
+  sum(abs(truth - pred)*weight)/sum(weight)
 }
 
 #'
@@ -134,5 +134,5 @@ WMAPE <- function(truth, pred, weight = NULL) {
     weight <- weight/sum(weight)*length(truth)
   }
 
-  mean(abs(truth - pred)/truth*weight)
+  sum(abs(truth - pred)/truth*weight)/sum(weight)
 }
