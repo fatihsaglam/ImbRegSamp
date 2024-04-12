@@ -19,6 +19,8 @@ and Ribeiro 2017)
 6- GSMOTER (Geometric SMOTE for Regression) (Camacho, Douzas, and Bacao
 2022)
 
+7- SMOTERWB (SMOTER with Boosting)
+
 Implemented metrics are:
 
 1- WSSE (weighted sum of squared error)
@@ -29,6 +31,16 @@ Implemented metrics are:
 
 4- WMAPE (weighted mean absolute percentage error)
 
+5- MU (Mean utility scores) (Luis Torgo and Ribeiro 2007)
+
+6- NMU (Normalized mean utility scores) (Luis Torgo and Ribeiro 2007)
+
+7- Precision for regression (Luis Torgo and Ribeiro 2007)
+
+8- Recall for regression (Luis Torgo and Ribeiro 2007)
+
+9- *F*<sub>*β*</sub> for regression (Luis Torgo and Ribeiro 2007)
+
 Implemented relevance functions are:
 
 1- PCHIP (Piecewise Cubic Hermite Interpolating Polynomials) (Luis Torgo
@@ -37,6 +49,8 @@ and Ribeiro 2007)
 2- [Inverse Kernel Density
 Estimation](https://link.springer.com/article/10.1007/s10994-021-06023-5)
 (Steininger et al. 2021)
+
+3- Sigmoid relevance (Luis Torgo and Ribeiro 2009)
 
 More methods will be added.
 
@@ -71,6 +85,10 @@ Torgo, Luis, and Rita Ribeiro. 2007. “Utility-Based Regression.” In
 *Knowledge Discovery in Databases: PKDD 2007: 11th European Conference
 on Principles and Practice of Knowledge Discovery in Databases, Warsaw,
 Poland, September 17-21, 2007. Proceedings 11*, 597–604. Springer.
+
+———. 2009. “Precision and Recall for Regression.” In *Discovery Science:
+12th International Conference, DS 2009, Porto, Portugal, October 3-5,
+2009 12*, 332–46. Springer.
 
 Torgo, Luís, Rita P. Ribeiro, Bernhard Pfahringer, and Paula Branco.
 2013. “SMOTE for Regression.” In *Progress in Artificial Intelligence*,

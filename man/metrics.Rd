@@ -5,6 +5,11 @@
 \alias{WMSE}
 \alias{WMAD}
 \alias{WMAPE}
+\alias{MU}
+\alias{NMU}
+\alias{precisionReg}
+\alias{recallReg}
+\alias{Fbeta}
 \title{Weighted Performance Metrics}
 \usage{
 WSSE(truth, pred, weight = NULL)
@@ -14,6 +19,16 @@ WMSE(truth, pred, weight = NULL)
 WMAD(truth, pred, weight = NULL)
 
 WMAPE(truth, pred, weight = NULL)
+
+MU(truth, pred, phi = NULL, y_train)
+
+NMU(truth, pred, phi = NULL, y_train)
+
+precisionReg(truth, pred, phi = NULL, thresh = 0.5, y_train, p = 0.5)
+
+recallReg(truth, pred, phi = NULL, thresh = 0.5, y_train, p = 0.5)
+
+Fbeta(truth, pred, phi = NULL, thresh = 0.5, y_train, p = 0.5, beta = 1)
 }
 \arguments{
 \item{truth}{true values.}
@@ -35,15 +50,23 @@ Calculates weighted errors. They can be used as a performance or
 model selection metric in imbalanced regression when weights are determined
 same as train data. An example is given below. Implemented methods are
 
-WSSE: Weighted sum of squared errors.
+- WSSE: Weighted sum of squared errors.
 
-WMSE: Weighted mean squared error.
+- WMSE: Weighted mean squared error.
 
-WMAD: Weighted mean absolute deviation.
+- WMAD: Weighted mean absolute deviation.
 
-WMAPE: weighted mean absolute percentage error
+- WMAPE: weighted mean absolute percentage error.
 
-More will come.
+- MU: Mean utility.
+
+- NMU: Normalized mean utility.
+
+- precision for regression
+
+- recall for regression
+
+- Fbeta score for regression. Default beta is 1.
 }
 \examples{
 
