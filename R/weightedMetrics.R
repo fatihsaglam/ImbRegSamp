@@ -179,9 +179,14 @@ precisionReg <- function(truth, pred, phi = NULL, thresh = 0.5, y_train, p = 0.5
   z_truth <- as.numeric(m_rel_truth$rel > thresh)
   z_pred <- as.numeric(m_rel_pred$rel > thresh)
 
-  sum((1 + u)[z_truth == 1 & z_pred == 1])/
-    (sum((1 + m_rel_truth$rel)[z_truth == 1 & z_pred == 1]) +
-       sum((2 - p*(1 - m_rel_truth$rel))[z_truth == 0 & z_pred == 1]))
+  if (sum((1 + u)[z_truth == 1 & z_pred == 1]) == 0) {
+    return(0)
+  } else {
+    sum((1 + u)[z_truth == 1 & z_pred == 1])/
+      (sum((1 + m_rel_truth$rel)[z_truth == 1 & z_pred == 1]) +
+         sum((2 - p*(1 - m_rel_truth$rel))[z_truth == 0 & z_pred == 1]))
+  }
+
 }
 
 #'
@@ -194,8 +199,12 @@ recallReg <- function(truth, pred, phi = NULL, thresh = 0.5, y_train, p = 0.5, .
   z_truth <- as.numeric(m_rel_truth$rel > thresh)
   z_pred <- as.numeric(m_rel_pred$rel > thresh)
 
-  sum((1 + u)[z_truth == 1 & z_pred == 1])/
-    sum((1 + m_rel_truth$rel)[z_truth == 1])
+  if (sum((1 + u)[z_truth == 1 & z_pred == 1]) == 0) {
+    return(0)
+  } else {
+    sum((1 + u)[z_truth == 1 & z_pred == 1])/
+      sum((1 + m_rel_truth$rel)[z_truth == 1])
+  }
 }
 
 #'
