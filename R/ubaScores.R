@@ -19,6 +19,8 @@
 #' September 17-21, 2007. Proceedings 11 (pp. 597-604). Springer Berlin
 #' Heidelberg.
 #'
+#' @importFrom utils tail
+#'
 #' @noRd
 
 ubaScores <- function(u, z) {

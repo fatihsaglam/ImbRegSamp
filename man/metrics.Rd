@@ -12,31 +12,41 @@
 \alias{Fbeta}
 \title{Weighted Performance Metrics}
 \usage{
-WSSE(truth, pred, weight = NULL)
+WSSE(truth, pred, phi = NULL, ...)
 
-WMSE(truth, pred, weight = NULL)
+WMSE(truth, pred, phi = NULL, ...)
 
-WMAD(truth, pred, weight = NULL)
+WMAD(truth, pred, phi = NULL, ...)
 
-WMAPE(truth, pred, weight = NULL)
+WMAPE(truth, pred, phi = NULL, ...)
 
-MU(truth, pred, phi = NULL, y_train)
+MU(truth, pred, phi = NULL, y_train, ...)
 
-NMU(truth, pred, phi = NULL, y_train)
+NMU(truth, pred, phi = NULL, y_train, ...)
 
-precisionReg(truth, pred, phi = NULL, thresh = 0.5, y_train, p = 0.5)
+precisionReg(truth, pred, phi = NULL, thresh = 0.5, y_train, p = 0.5, ...)
 
-recallReg(truth, pred, phi = NULL, thresh = 0.5, y_train, p = 0.5)
+recallReg(truth, pred, phi = NULL, thresh = 0.5, y_train, p = 0.5, ...)
 
-Fbeta(truth, pred, phi = NULL, thresh = 0.5, y_train, p = 0.5, beta = 1)
+Fbeta(truth, pred, phi = NULL, thresh = 0.5, y_train, p = 0.5, beta = 1, ...)
 }
 \arguments{
 \item{truth}{true values.}
 
 \item{pred}{predictions.}
 
-\item{weight}{a numerical vector of length same as truth and pred. Default is
+\item{phi}{a numerical vector of length same as truth and pred. Default is
 NULL. If NULL, it is equal to all samples are equally weighted.}
+
+\item{...}{not used for now.}
+
+\item{y_train}{train target variable.}
+
+\item{thresh}{threshold for rare values. Default is 0.5.}
+
+\item{p}{weighted sum parameter for utility scores.Default is 0.5, i.e. equal phis.}
+
+\item{beta}{F score type.}
 }
 \value{
 a numerical value.
@@ -47,14 +57,14 @@ regression models
 }
 \details{
 Calculates weighted errors. They can be used as a performance or
-model selection metric in imbalanced regression when weights are determined
+model selection metric in imbalanced regression when phis are determined
 same as train data. An example is given below. Implemented methods are
 
-- WSSE: Weighted sum of squared errors.
+- WSSE: weighted sum of squared errors.
 
-- WMSE: Weighted mean squared error.
+- WMSE: weighted mean squared error.
 
-- WMAD: Weighted mean absolute deviation.
+- WMAD: weighted mean absolute deviation.
 
 - WMAPE: weighted mean absolute percentage error.
 
@@ -88,22 +98,22 @@ m_lm <- lm(y~., data = data_train)
 
 pred_test <- predict(m_lm, newdata = data.frame(x = x_test))
 
-### weights for test data
+### phis for test data
 m_rel <- relevance_PCHIP(y = y_train, y_new = y_test)
 
 ### weighted sum of squares
-SSE_weighted <- WSSE(truth = y_test, pred = pred_test, weight = m_rel$rel)
+SSE_weighted <- WSSE(truth = y_test, pred = pred_test, phi = m_rel$rel)
 SSE_weighted
 ### weighted mean squared error
-MSE_weighted <- WMSE(truth = y_test, pred = pred_test, weight = m_rel$rel)
+MSE_weighted <- WMSE(truth = y_test, pred = pred_test, phi = m_rel$rel)
 MSE_weighted
 
 ### weighted mean absolute deviation
-MAD_weighted <- WMAD(truth = y_test, pred = pred_test, weight = m_rel$rel)
+MAD_weighted <- WMAD(truth = y_test, pred = pred_test, phi = m_rel$rel)
 MAD_weighted
 
 ### weighted mean absolute percentage error
-MAPE_weighted <- WMAPE(truth = y_test, pred = pred_test, weight = m_rel$rel)
+MAPE_weighted <- WMAPE(truth = y_test, pred = pred_test, phi = m_rel$rel)
 MAPE_weighted
 
 }
