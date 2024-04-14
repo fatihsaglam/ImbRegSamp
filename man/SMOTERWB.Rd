@@ -9,11 +9,12 @@ SMOTERWB(
   y,
   thresh_rel = 0.5,
   phi = NULL,
+  type = 1,
   perc_ov_lower = NULL,
   perc_ov_upper = NULL,
   perc_un = NULL,
   k_max = NULL,
-  n_weak_classifier = 100,
+  n_weak_learner = 30,
   rel_method = "PCHIP",
   ...
 )
@@ -39,12 +40,12 @@ is automatically determined by algorithm. Cannot be higher than 1.}
 
 \item{k_max}{to increase maximum number of neighbors. Determined automatically.}
 
-\item{n_weak_classifier}{number of weak classifiers for boosting.}
-
 \item{rel_method}{method for relevance function. Default is "PCHIP". Choices
 are "PCHIP" and "density". Ignored if phi is given.}
 
 \item{...}{relevance function settings.}
+
+\item{n_weak_classifier}{number of weak classifiers for boosting.}
 }
 \value{
 an list object which includes:

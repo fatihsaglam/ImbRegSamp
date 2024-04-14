@@ -6,7 +6,7 @@
 #' @param data_notRare non-rare dataset.
 #' @param perc_ov percentage of oversampling.
 #' @param k_max to increase maximum number of neighbors. Determined automatically.
-#' @param n_weak_classifier number of weak classifiers for boosting.
+#' @param n_weak_learner number of weak learners for boosting.
 #'
 #' @details
 #' To be used inside SMOTERWB to generate data when oversampling.
@@ -24,7 +24,11 @@ generator_SMOTERWB <- function(data_rare,
                                data_notRare,
                                perc_ov,
                                k_max,
-                               n_weak_classifier) {
+                               n_weak_learner,
+                               type = 1,
+                               regressor = "lm",
+                               lr = 0.1,
+                               loss = "linear") {
   n_rare <- nrow(data_rare)
   p_rare <- ncol(data_rare) - 1
   n_notRare <- nrow(data_notRare)
@@ -33,17 +37,33 @@ generator_SMOTERWB <- function(data_rare,
     return(matrix(NA, nrow = 0, ncol = p_rare + 1))
   }
 
-  x <- rbind(data_rare[, 1:p_rare, drop = FALSE], data_notRare[, 1:p_rare, drop = FALSE])
+  x <-
+    rbind(data_rare[, 1:p_rare, drop = FALSE], data_notRare[, 1:p_rare, drop = FALSE])
+  y <- c(data_rare[, p_rare + 1], data_notRare[, p_rare + 1])
+
   class_rare <- "rare"
   class_notRare <- "notRare"
-  y_rareness <-
+  z <-
     as.factor(c(rep(class_rare, n_rare), rep(class_notRare, n_notRare)))
 
-  w <-
-    boosted_weights(x = x, y = y_rareness, n_iter = n_weak_classifier)
 
-  w_rare <- w[y_rareness == class_rare]
-  w_notRare <- w[y_rareness == class_notRare]
+  if (type == 1) {
+    w <-
+      boosted_weights_regression(
+        x = x,
+        y = y,
+        n_iter = n_weak_learner,
+        regressor = regressor,
+        lr = lr,
+        loss = loss
+      )
+  } else if (type == 2) {
+    w <-
+      boosted_weights(x = x, y = z, n_iter = n_weak_learner)
+  }
+
+  w_rare <- w[z == class_rare]
+  w_notRare <- w[z == class_notRare]
 
   wclass_rare <- n_all / n_rare * 0.5
   wclass_notRare <- n_all / n_notRare * 0.5
@@ -84,16 +104,16 @@ generator_SMOTERWB <- function(data_rare,
   NN_temp <- matrix(data = NA,
                     nrow = n_rare,
                     ncol = k_max)
-  NN_temp[nl_rare == "noise", ] <-
+  NN_temp[nl_rare == "noise",] <-
     NN[nl_rare == "noise", -(k_max + 1)]
-  NN_temp[nl_rare == "notnoise", ] <- NN[nl_rare == "notnoise", -1]
+  NN_temp[nl_rare == "notnoise",] <- NN[nl_rare == "notnoise", -1]
   NN <- NN_temp
 
   k <- c()
   fl <- c()
 
   for (i in 1:n_rare) {
-    cls <- y_notnoise[NN[i, ]]
+    cls <- y_notnoise[NN[i,]]
 
     if (all(cls == class_rare)) {
       k[i] <- k_max
@@ -129,7 +149,7 @@ generator_SMOTERWB <- function(data_rare,
   for (i in 1:n_rare) {
     if (fl[i] == "lonely") {
       i_step <- rep(i, C[i])
-      data_syn_step <- data_rare[i_step, ]
+      data_syn_step <- data_rare[i_step,]
       data_syn <- rbind(data_syn, data_syn_step)
     }
     if (fl[i] == "good") {
@@ -140,7 +160,7 @@ generator_SMOTERWB <- function(data_rare,
       i_k <- sample(1:k[i], C[i], replace = TRUE)
       lambda <- runif(C[i])
       kk <- data_notnoise[NN_i, , drop = FALSE]
-      kk <- kk[i_k, ]
+      kk <- kk[i_k,]
       data_rare_i_temp <- data_rare[rep(i, C[i]), , drop = FALSE]
       data_syn_step <-
         data_rare_i_temp + (kk - data_rare_i_temp) * lambda

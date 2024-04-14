@@ -88,10 +88,10 @@ analyzeImbalance <- function(
 
   imbRate <- if (n_rare > 0) n_notRare/n_rare else NA
   imbRate_lower <- if (n_rare_lower > 0) n_notRare/n_rare_lower else NA
-  imbRate_upper <- if (n_rare_lower > 0) n_notRare/n_rare_upper else NA
+  imbRate_upper <- if (n_rare_upper > 0) n_notRare/n_rare_upper else NA
 
-  min_y_rare_upper <- if (n_rare_upper > 0) min(data_rare_upper[,p+1]) else NA
   max_y_rare_lower <- if (n_rare_lower > 0) max(data_rare_lower[,p+1]) else NA
+  min_y_rare_upper <- if (n_rare_upper > 0) min(data_rare_upper[,p+1]) else NA
 
   cat(
     " Number of samples:\n",

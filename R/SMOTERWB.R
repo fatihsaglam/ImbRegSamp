@@ -71,11 +71,12 @@ SMOTERWB <-
            y,
            thresh_rel = 0.5,
            phi = NULL,
+           type = 1,
            perc_ov_lower = NULL,
            perc_ov_upper = NULL,
            perc_un = NULL,
            k_max = NULL,
-           n_weak_classifier = 100,
+           n_weak_learner = 30,
            rel_method = "PCHIP",
            ...) {
     data <- as.matrix(cbind(x, y))
@@ -187,14 +188,16 @@ SMOTERWB <-
                          data_notRare = data_notRare,
                          perc_ov = perc_ov_lower,
                          k_max = k_max_lower,
-                         n_weak_classifier = n_weak_classifier)
+                         n_weak_learner = n_weak_learner,
+                         type = type)
 
     data_syn_upper <-
       generator_SMOTERWB(data_rare = data_rare_upper,
                          data_notRare = data_notRare,
                          perc_ov = perc_ov_upper,
                          k_max = k_max_upper,
-                         n_weak_classifier = n_weak_classifier)
+                         n_weak_learner = n_weak_learner,
+                         type = type)
 
     data_syn <- rbind(data_syn_lower,
                       data_syn_upper)
