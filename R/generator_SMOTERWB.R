@@ -25,9 +25,9 @@ generator_SMOTERWB <- function(data_rare,
                                perc_ov,
                                k_max,
                                n_weak_learner,
-                               type = 1,
+                               type = 2,
                                regressor = "lm",
-                               lr = 0.1,
+                               lr = 1,
                                loss = "linear") {
   n_rare <- nrow(data_rare)
   p_rare <- ncol(data_rare) - 1

@@ -36,9 +36,9 @@ boosted_weights <- function(x,
   n <- nrow(x)
   w <- rep(1 / n, n)
   k_class <- length(levels(y))
+  dat <- data.frame(x, y = y)
 
   for (i in 1:n_iter) {
-    dat <- data.frame(x, y = y)
     model <- rpart(y ~ .,
                    data = dat,
                    weights = w,
