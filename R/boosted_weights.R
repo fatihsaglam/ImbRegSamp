@@ -30,12 +30,25 @@ boosted_weights <- function(x,
                             y,
                             n_iter = 100,
                             lr = 1,
-                            control = rpart.control(minsplit = 3,
-                                                    cp = 0.01,
-                                                    maxdepth = 30)) {
+                            control = NULL) {
+
   n <- nrow(x)
   w <- rep(1 / n, n)
   k_class <- length(levels(y))
+
+  if (is.null(control)) {
+    control <- rpart.control(
+      minsplit = if (n <= 400)
+        20
+      else
+        3,
+      cp = if (n <= 400)
+        0.1
+      else
+        0.01,
+      maxdepth = 30
+    )
+  }
 
   for (i in 1:n_iter) {
     dat <- data.frame(x, y = y)

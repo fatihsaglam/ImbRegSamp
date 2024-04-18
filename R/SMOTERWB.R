@@ -71,7 +71,7 @@ SMOTERWB <-
            y,
            thresh_rel = 0.5,
            phi = NULL,
-           type = 1,
+           type = 2,
            perc_ov_lower = NULL,
            perc_ov_upper = NULL,
            perc_un = NULL,
