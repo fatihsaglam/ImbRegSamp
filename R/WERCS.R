@@ -163,7 +163,7 @@ WERCS <- function(x,
 
   ### undersampling ###
   i_notRare_undersampled <-
-    sample(1:n_notRare, round(n_notRare * perc_un), prob = phi[i_notRare] + 1e-10)
+    sample(1:n_notRare, round(n_notRare * perc_un), prob = pmax(phi[i_notRare], 1e-6))
   data_notRare_undersampled <-
     data_notRare[i_notRare_undersampled,]
   ### undersampling finished ###
