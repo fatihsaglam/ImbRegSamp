@@ -23,7 +23,7 @@
 #'
 #' @noRd
 
-utilityScores <- function(y_test, pred_test, y_train, p = 0.5) {
+utilityScores <- function(y_test, pred_test, y_train, p = 0.5, loss = "absolute") {
   m_rel <- ImbRegSamp::relevance_PCHIP(y = y_train)
   bumps <- m_rel$rel_model$pars$S_points
 
@@ -42,16 +42,27 @@ utilityScores <- function(y_test, pred_test, y_train, p = 0.5) {
     S_phi = m_rel$rel_model$pars$S_phi,
     S_der = m_rel$rel_model$pars$S_der
   )
-  phi_y_new <- m_rel_y_new$rel
-  phi_pred <- m_rel_pred$rel
+  phi_y_test <- m_rel_y_new$rel
+  phi_pred_test <- m_rel_pred$rel
 
-  loss <- abs(y_test - pred_test)
+  if (loss == "absolute") {
+    loss <- abs(y_test - pred_test)
+  } else if (loss == "squared") {
+    loss <- (y_test - pred_test)^2
+  }
 
-  L <- ifelse(pred_test < y_test, abs(y_test - bumps[1]), abs(y_test - bumps[3]))
-  gamma <- ifelse(loss < L, loss / L, 1)
+  L_B <- ifelse(pred_test < y_test, abs(y_test - bumps[2]), abs(y_test - Inf))
+  L_B <- pmin(L_B, Inf)
 
-  phi_joint_p <- (1 - p) * phi_pred + p * phi_y_new
-  utility_phi_p <- phi_y_new*(1 - gamma) - phi_joint_p*gamma
+  L_C <- ifelse(pred_test < y_test, abs(y_test - bumps[1]), abs(y_test - bumps[3]))
+  L_C <- pmin(L_C, Inf)
+
+  gamma_B <- ifelse(loss < L_B, loss / L_B, 1)
+  gamma_C <- ifelse(loss < L_C, loss / L_C, 1)
+
+  phi_joint_p <- (1 - p) * phi_pred_test + p * phi_y_test
+
+  utility_phi_p <- phi_y_test*(1 - gamma_B) - phi_joint_p*gamma_C
 
   return(utility_phi_p)
 }
