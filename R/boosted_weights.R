@@ -42,7 +42,7 @@ boosted_weights <- function(x,
       minsplit = if (n <= 400)
         20
       else
-        3,
+        7,
       cp = if (n <= 400)
         0.1
       else

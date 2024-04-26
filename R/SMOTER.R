@@ -86,9 +86,7 @@ SMOTER <-
       phi <- m_rel$rel
     } else {
       m_rel <- list()
-      m_rel$rel_model <- list(
-        method = "manual"
-      )
+      m_rel$rel_model <- list(method = "manual")
       if (length(phi) != n) {
         stop("phi must be equal length to y")
       }
@@ -100,23 +98,23 @@ SMOTER <-
       }
     }
 
-    i_rare_lower <- (phi > thresh_rel & y < median(y))
-    i_rare_upper <- (phi > thresh_rel & y > median(y))
+    i_lowerRare <- (phi > thresh_rel & y < median(y))
+    i_upperRare <- (phi > thresh_rel & y > median(y))
     i_notRare <- (phi <= thresh_rel)
 
-    data_notRare <- data[i_notRare, ]
+    data_notRare <- data[i_notRare,]
     n_notRare <- nrow(data_notRare)
-    data_rare_lower <- data[i_rare_lower,]
-    n_rare_lower <- nrow(data_rare_lower)
-    data_rare_upper <- data[i_rare_upper,]
-    n_rare_upper <- nrow(data_rare_upper)
+    data_lowerRare <- data[i_lowerRare, ]
+    n_lowerRare <- nrow(data_lowerRare)
+    data_upperRare <- data[i_upperRare, ]
+    n_upperRare <- nrow(data_upperRare)
 
     n_effbump <- sum(n_notRare > 0,
-                     n_rare_lower > 0,
-                     n_rare_upper > 0)
+                     n_lowerRare > 0,
+                     n_upperRare > 0)
 
     if (is.null(perc_ov_lower)) {
-      perc_ov_lower <- n / n_effbump / n_rare_lower
+      perc_ov_lower <- n / n_effbump / n_lowerRare
       if (perc_ov_lower < 1) {
         perc_ov_lower <- 1
       }
@@ -126,7 +124,7 @@ SMOTER <-
       }
     }
     if (is.null(perc_ov_upper)) {
-      perc_ov_upper <- n / n_effbump / n_rare_upper
+      perc_ov_upper <- n / n_effbump / n_upperRare
       if (perc_ov_upper < 1) {
         perc_ov_upper <- 1
       }
@@ -156,10 +154,10 @@ SMOTER <-
       "\n"
     )
     cat(
-      "n_rare_lower:",
-      n_rare_lower,
-      "| n_rare_upper:",
-      n_rare_upper,
+      "n_lowerRare:",
+      n_lowerRare,
+      "| n_upperRare:",
+      n_upperRare,
       "| n_notRare:",
       n_notRare,
       "\n"
@@ -169,44 +167,47 @@ SMOTER <-
     i_notRare_undersampled <-
       sample(1:n_notRare, round(n_notRare * perc_un))
     data_notRare_undersampled <-
-      data_notRare[i_notRare_undersampled,]
+      data_notRare[i_notRare_undersampled, ]
     ### undersampling finished ###
 
-    k_lower <- min(k, n_rare_lower - 1)
-    k_upper <- min(k, n_rare_upper - 1)
+    k_lower <- min(k, n_lowerRare - 1)
+    k_upper <- min(k, n_upperRare - 1)
 
-    data_syn_lower <-
-      generator_SMOTER(data_rare = data_rare_lower,
+    data_lowerSyn <-
+      generator_SMOTER(data_rare = data_lowerRare,
                        perc_ov = perc_ov_lower,
                        k = k_lower)
-    data_syn_upper <-
-      generator_SMOTER(data_rare = data_rare_upper,
+    data_upperSyn <-
+      generator_SMOTER(data_rare = data_upperRare,
                        perc_ov = perc_ov_upper,
                        k = k_upper)
 
-    data_syn <- rbind(data_syn_lower,
-                      data_syn_upper)
-    data_new <- rbind(data_notRare_undersampled,
-                      data_syn_lower,
-                      data_syn_upper,
-                      data_rare_lower,
-                      data_rare_upper)
-    groups_new <- c(rep("notRare_undersampled", nrow(data_notRare_undersampled)),
-                    rep("syn_lower", nrow(data_syn_lower)),
-                    rep("syn_upper", nrow(data_syn_upper)),
-                    rep("rare_lower", nrow(data_rare_lower)),
-                    rep("rare_upper", nrow(data_rare_upper)))
+    data_syn <- rbind(data_lowerSyn,
+                      data_upperSyn)
+    data_new <- rbind(
+      data_notRare_undersampled,
+      data_lowerSyn,
+      data_upperSyn,
+      data_lowerRare,
+      data_upperRare
+    )
+    groups_new <-
+      c(
+        rep("notRare_undersampled", nrow(data_notRare_undersampled)),
+        rep("lowerSyn", nrow(data_lowerSyn)),
+        rep("upperSyn", nrow(data_upperSyn)),
+        rep("lowerRare", nrow(data_lowerRare)),
+        rep("upperRare", nrow(data_upperRare))
+      )
     groups_new <- as.factor(groups_new)
 
-    data_original <- rbind(
-      data_notRare,
-      data_rare_lower,
-      data_rare_upper
-    )
+    data_original <- rbind(data_lowerRare,
+                           data_notRare,
+                           data_upperRare)
 
-    groups_original <- c(rep("notRare", nrow(data_notRare)),
-                         rep("rare_lower", nrow(data_rare_lower)),
-                         rep("rare_upper", nrow(data_rare_upper)))
+    groups_original <- c(rep("lowerRare", nrow(data_lowerRare)),
+                         rep("notRare", nrow(data_notRare)),
+                         rep("upperRare", nrow(data_upperRare)))
     groups_original <- as.factor(groups_original)
 
     results <- list(

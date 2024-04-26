@@ -76,8 +76,11 @@ SMOTERWB <-
            perc_ov_upper = NULL,
            perc_un = NULL,
            k_max = NULL,
-           n_weak_learner = 30,
+           n_weak_learner = 50,
            rel_method = "PCHIP",
+           regressor = "lm",
+           lr = 1,
+           loss = "linear",
            ...) {
     data <- as.matrix(cbind(x, y))
     n <- nrow(data)
@@ -103,23 +106,28 @@ SMOTERWB <-
       }
     }
 
-    i_rare_lower <- (phi > thresh_rel & y < median(y))
-    i_rare_upper <- (phi > thresh_rel & y > median(y))
+    i_lowerRare <- (phi > thresh_rel & y < median(y))
+    i_upperRare <- (phi > thresh_rel & y > median(y))
     i_notRare <- (phi <= thresh_rel)
 
+
+    data_lowerRare <- data[i_lowerRare,]
+    n_lowerRare <- nrow(data_lowerRare)
     data_notRare <- data[i_notRare, ]
     n_notRare <- nrow(data_notRare)
-    data_rare_lower <- data[i_rare_lower,]
-    n_rare_lower <- nrow(data_rare_lower)
-    data_rare_upper <- data[i_rare_upper,]
-    n_rare_upper <- nrow(data_rare_upper)
+    data_upperRare <- data[i_upperRare,]
+    n_upperRare <- nrow(data_upperRare)
+
+    phi_lowerRare <- phi[i_lowerRare]
+    phi_notRare <- phi[i_notRare]
+    phi_upperRare <- phi[i_upperRare]
 
     n_effbump <- sum(n_notRare > 0,
-                     n_rare_lower > 0,
-                     n_rare_upper > 0)
+                     n_lowerRare > 0,
+                     n_upperRare > 0)
 
     if (is.null(perc_ov_lower)) {
-      perc_ov_lower <- n / n_effbump / n_rare_lower
+      perc_ov_lower <- n / n_effbump / n_lowerRare
       if (perc_ov_lower < 1) {
         perc_ov_lower <- 1
       }
@@ -129,7 +137,7 @@ SMOTERWB <-
       }
     }
     if (is.null(perc_ov_upper)) {
-      perc_ov_upper <- n / n_effbump / n_rare_upper
+      perc_ov_upper <- n / n_effbump / n_upperRare
       if (perc_ov_upper < 1) {
         perc_ov_upper <- 1
       }
@@ -159,70 +167,200 @@ SMOTERWB <-
       "\n"
     )
     cat(
-      "n_rare_lower:",
-      n_rare_lower,
-      "| n_rare_upper:",
-      n_rare_upper,
+      "n_lowerRare:",
+      n_lowerRare,
+      "| n_upperRare:",
+      n_upperRare,
       "| n_notRare:",
       n_notRare,
       "\n"
     )
 
-    ### undersampling ###
-    i_notRare_undersampled <-
-      sample(1:n_notRare, round(n_notRare * perc_un))
-    data_notRare_undersampled <-
-      data_notRare[i_notRare_undersampled,]
+
+    data_original <- rbind(
+      data_notRare,
+      data_lowerRare,
+      data_upperRare
+    )
+    class_lowerRare <- "lowerRare"
+    class_notRare <- "notRare"
+    class_upperRare <- "upperRare"
+    z <- c(rep(class_notRare, nrow(data_notRare)),
+           rep(class_lowerRare, nrow(data_lowerRare)),
+           rep(class_upperRare, nrow(data_upperRare)))
+    z <- as.factor(z)
+    phi <- c(phi_lowerRare, phi_notRare, phi_upperRare)
+
+    # class_rare <- "rare"
+    # class_notRare <- "notRare"
+    # z <-
+    #   as.factor(c(rep(class_rare, n_lowerRare), rep(class_notRare, n_notRare), rep(class_rare, n_upperRare)))
+    x <- data_original[,1:p, drop = FALSE]
+    y <- data_original[,p + 1]
+
+    if (type == 1) {
+      w <-
+        boosted_weights_regression(
+          x = x,
+          y = y,
+          n_iter = n_weak_learner,
+          regressor = regressor,
+          lr = lr,
+          loss = loss
+        )
+    } else if (type == 2) {
+      w <-
+        boosted_weights(x = x, y = z, n_iter = n_weak_learner)
+    }
+
+    w <- w/(phi + 1e-5)
+    w <- w/sum(w)
+
+    w_lowerRare <- w[z == class_lowerRare]
+    w_notRare <- w[z == class_notRare]
+    w_upperRare <- w[z == class_upperRare]
+
+    T_lowerRare <- (1/(3*n_lowerRare))
+    T_notRare <- (1/(3*n_notRare))
+    T_upperRare <- (1/(3*n_upperRare))
+
+    # T_lowerRare <- T_lowerRare/(n*sum(T_lowerRare, T_notRare, T_upperRare))
+    # T_notRare <- T_notRare/(n*sum(T_lowerRare, T_notRare, T_upperRare))
+    # T_upperRare <- T_upperRare/(n*sum(T_lowerRare, T_notRare, T_upperRare))
+
+    nl_lowerRare <- ifelse(w_lowerRare > T_lowerRare, "noise", "notNoise")
+    nl_notRare <- ifelse(w_notRare > T_notRare, "noise", "notNoise")
+    nl_upperRare <- ifelse(w_upperRare > T_upperRare, "noise", "notNoise")
+
+    n_lowerRare_noise <- sum(nl_lowerRare == "noise")
+    n_notRare_noise <- sum(nl_notRare == "noise")
+    n_upperRare_noise <- sum(nl_upperRare == "noise")
+
+    n_lowerRare_notNoise <- sum(nl_lowerRare == "notNoise")
+    n_notRare_notNoise <- sum(nl_notRare == "notNoise")
+    n_upperRare_notNoise <- sum(nl_upperRare == "notNoise")
+
+    data_lowerRare_noise <- data_lowerRare[nl_lowerRare == "noise", , drop = FALSE]
+    data_notRare_noise <-
+      data_notRare[nl_notRare == "noise", , drop = FALSE]
+    data_upperRare_noise <- data_upperRare[nl_upperRare == "noise", , drop = FALSE]
+
+    data_lowerRare_notNoise <-
+      data_lowerRare[nl_lowerRare == "notNoise", , drop = FALSE]
+    data_notRare_notNoise <-
+      data_notRare[nl_notRare == "notNoise", , drop = FALSE]
+    data_upperRare_notNoise <-
+      data_upperRare[nl_upperRare == "notNoise", , drop = FALSE]
+
+    ### undersampling ####
+    n_notRare_toBeRemoved <- round(n_notRare - n_notRare*perc_un)
+
+    n_notRare_toBeRemoved_noise <- min(n_notRare_toBeRemoved, n_notRare_noise)
+    n_notRare_toBeRemoved_notNoise <- n_notRare_toBeRemoved - n_notRare_toBeRemoved_noise
+
+    i_notRare_toBeRemoved_noise <- sample(1:n_notRare_noise, n_notRare_toBeRemoved_noise)
+    i_notRare_toBeRemoved_notNoise <- sample(1:n_notRare_notNoise, n_notRare_toBeRemoved_notNoise)
+
+    if (sum(i_notRare_toBeRemoved_noise) == 0) {
+      data_notRare_undersampled_noise <-
+        data_notRare[nl_notRare == "noise", , drop = FALSE]
+    } else {
+      data_notRare_undersampled_noise <-
+        data_notRare[nl_notRare == "noise", , drop = FALSE][-i_notRare_toBeRemoved_noise, , drop = FALSE]
+    }
+
+
+    if (sum(i_notRare_toBeRemoved_notNoise) == 0) {
+      data_notRare_undersampled_notNoise <-
+        data_notRare[nl_notRare == "notNoise", , drop = FALSE]
+    }    else {
+      data_notRare_undersampled_notNoise <-
+        data_notRare[nl_notRare == "notNoise", , drop = FALSE][-i_notRare_toBeRemoved_notNoise, , drop = FALSE]
+    }
+
+    data_notRare_undersampled <- rbind(
+      data_notRare_undersampled_noise,
+      data_notRare_undersampled_notNoise
+    )
+
+    # i_notRare_undersampled <-
+    #   sample(1:n_notRare, round(n_notRare * perc_un))
+    # data_notRare_undersampled <-
+    #   data_notRare[i_notRare_undersampled,]
+
     ### undersampling finished ###
 
     if (is.null(k_max)) {
-      k_max_lower <- ceiling(n_notRare/n_rare_lower)
-      k_max_upper <- ceiling(n_notRare/n_rare_upper)
+      k_max_lower <- ceiling(n_notRare/n_lowerRare)
+      k_max_upper <- ceiling(n_notRare/n_upperRare)
+    } else {
+      if (length(k_max) == 1) {
+        k_max_lower <- k_max
+        k_max_upper <- k_max
+      } else if (length(k_max) == 2) {
+        k_max_lower <- k_max[1]
+        k_max_upper <- k_max[2]
+      }
     }
 
-    k_max_lower <- min(k_max_lower, n_rare_lower - 1)
-    k_max_upper <- min(k_max_upper, n_rare_upper - 1)
+    k_max_lower <- min(k_max_lower, n_lowerRare - 1)
+    k_max_upper <- min(k_max_upper, n_upperRare - 1)
 
     data_syn_lower <-
-      generator_SMOTERWB(data_rare = data_rare_lower,
-                         data_notRare = data_notRare,
-                         perc_ov = perc_ov_lower,
-                         k_max = k_max_lower,
-                         n_weak_learner = n_weak_learner,
-                         type = type)
+      generator_SMOTERWB(
+        data_rare = data_lowerRare,
+        data_notRare = data_notRare,
+        perc_ov = perc_ov_lower,
+        k_max = k_max_lower,
+        n_weak_learner = n_weak_learner,
+        nl_rare = nl_lowerRare,
+        nl_notRare = nl_notRare,
+        class_rare = class_lowerRare,
+        class_notRare = class_notRare,
+        phi = phi_lowerRare
+      )
+
+
+    # data_rare = data_upperRare
+    # data_notRare = data_notRare
+    # perc_ov = perc_ov_upper
+    # k_max = k_max_upper
+    # n_weak_learner = n_weak_learner
+    # nl_rare = nl_upperRare
+    # nl_notRare = nl_notRare
+    # class_rare = class_upperRare
+    # class_notRare = class_notRare
+    # phi = phi_upperRare
 
     data_syn_upper <-
-      generator_SMOTERWB(data_rare = data_rare_upper,
-                         data_notRare = data_notRare,
-                         perc_ov = perc_ov_upper,
-                         k_max = k_max_upper,
-                         n_weak_learner = n_weak_learner,
-                         type = type)
+      generator_SMOTERWB(
+        data_rare = data_upperRare,
+        data_notRare = data_notRare,
+        perc_ov = perc_ov_upper,
+        k_max = k_max_upper,
+        n_weak_learner = n_weak_learner,
+        nl_rare = nl_upperRare,
+        nl_notRare = nl_notRare,
+        class_rare = class_upperRare,
+        class_notRare = class_notRare,
+        phi = phi_upperRare
+      )
 
     data_syn <- rbind(data_syn_lower,
                       data_syn_upper)
     data_new <- rbind(data_notRare_undersampled,
                       data_syn_lower,
                       data_syn_upper,
-                      data_rare_lower,
-                      data_rare_upper)
+                      data_lowerRare,
+                      data_upperRare)
     groups_new <- c(rep("notRare_undersampled", nrow(data_notRare_undersampled)),
-                    rep("syn_lower", nrow(data_syn_lower)),
-                    rep("syn_upper", nrow(data_syn_upper)),
-                    rep("rare_lower", nrow(data_rare_lower)),
-                    rep("rare_upper", nrow(data_rare_upper)))
+                    rep("lowerSyn", nrow(data_syn_lower)),
+                    rep("upperSyn", nrow(data_syn_upper)),
+                    rep("lowerRare", nrow(data_lowerRare)),
+                    rep("upperRare", nrow(data_upperRare)))
     groups_new <- as.factor(groups_new)
 
-    data_original <- rbind(
-      data_notRare,
-      data_rare_lower,
-      data_rare_upper
-    )
-
-    groups_original <- c(rep("notRare", nrow(data_notRare)),
-                         rep("rare_lower", nrow(data_rare_lower)),
-                         rep("rare_upper", nrow(data_rare_upper)))
-    groups_original <- as.factor(groups_original)
+    nl_original = as.factor(c(nl_lowerRare, nl_notRare, nl_upperRare))
 
     results <- list(
       x_new = data_new[, 1:p],
@@ -230,12 +368,16 @@ SMOTERWB <-
       groups_new = groups_new,
       x_original = data_original[, 1:p],
       y_original = data_original[, p + 1],
-      groups_original = groups_original,
+      groups_original = z,
       x_syn = data_syn[, 1:p],
       y_syn = data_syn[, p + 1],
+      nl_original = nl_original,
+      w = w,
+      noise_ratio = sum(nl_original == "noise")/n,
       phi = phi,
       rel_model = m_rel$rel_model
     )
 
     return(results)
   }
+

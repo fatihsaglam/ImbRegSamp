@@ -14,8 +14,11 @@ SMOTERWB(
   perc_ov_upper = NULL,
   perc_un = NULL,
   k_max = NULL,
-  n_weak_learner = 30,
+  n_weak_learner = 50,
   rel_method = "PCHIP",
+  regressor = "lm",
+  lr = 1,
+  loss = "linear",
   ...
 )
 }

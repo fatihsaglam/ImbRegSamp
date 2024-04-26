@@ -74,24 +74,24 @@ analyzeImbalance <- function(
     }
   }
 
-  i_rare_lower <- (phi > thresh_rel & y < median(y))
-  i_rare_upper <- (phi > thresh_rel & y > median(y))
+  i_lowerRare <- (phi > thresh_rel & y < median(y))
+  i_upperRare <- (phi > thresh_rel & y > median(y))
   i_notRare <- (phi <= thresh_rel)
 
   data_notRare <- data[i_notRare, ]
   n_notRare <- nrow(data_notRare)
-  data_rare_lower <- data[i_rare_lower,]
-  n_rare_lower <- nrow(data_rare_lower)
-  data_rare_upper <- data[i_rare_upper,]
-  n_rare_upper <- nrow(data_rare_upper)
-  n_rare <- n_rare_lower + n_rare_upper
+  data_lowerRare <- data[i_lowerRare,]
+  n_lowerRare <- nrow(data_lowerRare)
+  data_upperRare <- data[i_upperRare,]
+  n_upperRare <- nrow(data_upperRare)
+  n_rare <- n_lowerRare + n_upperRare
 
   imbRate <- if (n_rare > 0) n_notRare/n_rare else NA
-  imbRate_lower <- if (n_rare_lower > 0) n_notRare/n_rare_lower else NA
-  imbRate_upper <- if (n_rare_upper > 0) n_notRare/n_rare_upper else NA
+  imbRate_lower <- if (n_lowerRare > 0) n_notRare/n_lowerRare else NA
+  imbRate_upper <- if (n_upperRare > 0) n_notRare/n_upperRare else NA
 
-  max_y_rare_lower <- if (n_rare_lower > 0) max(data_rare_lower[,p+1]) else NA
-  min_y_rare_upper <- if (n_rare_upper > 0) min(data_rare_upper[,p+1]) else NA
+  max_y_lowerRare <- if (n_lowerRare > 0) max(data_lowerRare[,p+1]) else NA
+  min_y_upperRare <- if (n_upperRare > 0) min(data_upperRare[,p+1]) else NA
 
   cat(
     " Number of samples:\n",
@@ -99,10 +99,10 @@ analyzeImbalance <- function(
     n,
     "| n_rare:",
     n_rare,
-    "| n_rare_lower:",
-    n_rare_lower,
-    "| n_rare_upper:",
-    n_rare_upper,
+    "| n_lowerRare:",
+    n_lowerRare,
+    "| n_upperRare:",
+    n_upperRare,
     "| n_notRare:",
     n_notRare,
     "\n-----\n",
@@ -115,22 +115,22 @@ analyzeImbalance <- function(
     if (is.na(imbRate_upper)) NA else formatC(imbRate_upper, digits = 3, format = "f"),
     "\n------\n",
     "Bumps:\n",
-    "min y_rare_upper:",
-    min_y_rare_upper,
-    "| max y_rare_lower:",
-    if (n_rare_lower > 0) max_y_rare_lower else "no rare",
+    "min y_upperRare:",
+    min_y_upperRare,
+    "| max y_lowerRare:",
+    if (n_lowerRare > 0) max_y_lowerRare else "no rare",
     "\n"
   )
 
   data_original <- rbind(
     data_notRare,
-    data_rare_lower,
-    data_rare_upper
+    data_lowerRare,
+    data_upperRare
   )
 
   groups_original <- c(rep("notRare", nrow(data_notRare)),
-                       rep("rare_lower", nrow(data_rare_lower)),
-                       rep("rare_upper", nrow(data_rare_upper)))
+                       rep("lowerRare", nrow(data_lowerRare)),
+                       rep("upperRare", nrow(data_upperRare)))
   groups_original <- as.factor(groups_original)
 
   results <- list(
@@ -142,12 +142,12 @@ analyzeImbalance <- function(
     imbRate = imbRate,
     imbRate_lower = imbRate_lower,
     imbRate_upper = imbRate_upper,
-    min_y_rare_upper = min_y_rare_upper,
-    max_y_rare_lower = max_y_rare_lower,
+    min_y_upperRare = min_y_upperRare,
+    max_y_lowerRare = max_y_lowerRare,
     n_notRare = n_notRare,
     n_rare = n_rare,
-    n_rare_upper = n_rare_upper,
-    n_rare_lower = n_rare_lower
+    n_upperRare = n_upperRare,
+    n_lowerRare = n_lowerRare
   )
 
   return(results)
