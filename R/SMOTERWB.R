@@ -307,7 +307,7 @@ SMOTERWB <-
 
     prob_sampling <- phi_notRare
 
-    prob_sampling[fl == "bad"] <- 1
+    prob_sampling[fl == "bad"] <- 0
 
     i_notRare_undersampled <-
       sample(1:n_notRare, round(n_notRare * perc_un), prob = pmax(prob_sampling, 1e-6))
