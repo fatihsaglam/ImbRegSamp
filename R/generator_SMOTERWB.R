@@ -105,14 +105,13 @@ generator_SMOTERWB <- function(data_rare,
 
   data_syn <- matrix(nrow = 0, ncol = p + 1)
   prop_sampling <- phi
-  phi[fl == "bad"] <- 0
+  prop_sampling[fl == "bad"] <- 0
 
   repeat {
     i <-
       sample(1:n_rare,
              1,
-             replace = TRUE,
-             prob = pmax(phi, 1e-6))
+             prob = pmax(prop_sampling, 1e-6))
 
     if (fl[i] == "lonely") {
       data_syn_step <- data_rare[i,]
