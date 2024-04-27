@@ -62,6 +62,7 @@ generator_SMOTERWB <- function(data_rare,
                             rep(class_notRare, nrow(data_notRare_notNoise))))
 
   k_max <- min(k_max, nrow(data_notNoise) - 1)
+
   NN <-
     knnx.index(data = data_notNoise[, 1:p, drop = FALSE],
                query = data_rare[, 1:p, drop = FALSE],
@@ -103,12 +104,15 @@ generator_SMOTERWB <- function(data_rare,
   n_syn <- round((perc_ov - 1) * n_rare)
 
   data_syn <- matrix(nrow = 0, ncol = p + 1)
-  if (p == 2) {
-    plot(x, col = z)
-  }
+  prop_sampling <- phi
+  phi[fl == "bad"] <- 0
 
   repeat {
-    i <- sample(which(fl == "good" | fl == "lonely"), 1, replace = TRUE, prob = phi[fl == "good" | fl == "lonely"] + 1e-5)
+    i <-
+      sample(1:n_rare,
+             1,
+             replace = TRUE,
+             prob = pmax(phi, 1e-6))
 
     if (fl[i] == "lonely") {
       data_syn_step <- data_rare[i,]
@@ -124,7 +128,6 @@ generator_SMOTERWB <- function(data_rare,
       data_syn_step <-
         data_rare_i_temp + (kk - data_rare_i_temp) * lambda
       data_syn <- rbind(data_syn, data_syn_step)
-      lines(rbind(kk, data_rare_i_temp), col = "red")
     }
 
     if (n_syn == nrow(data_syn)) {
