@@ -80,9 +80,9 @@ analyzeImbalance <- function(
 
   data_notRare <- data[i_notRare, ]
   n_notRare <- nrow(data_notRare)
-  data_lowerRare <- data[i_lowerRare,]
+  data_lowerRare <- data[i_lowerRare,, drop = FALSE]
   n_lowerRare <- nrow(data_lowerRare)
-  data_upperRare <- data[i_upperRare,]
+  data_upperRare <- data[i_upperRare,, drop = FALSE]
   n_upperRare <- nrow(data_upperRare)
   n_rare <- n_lowerRare + n_upperRare
 
