@@ -51,7 +51,7 @@ relevance_sigmoid <-
     if (is.null(adj_points)) {
       IQR <- IQR(y)
       adj_points <-
-        quantile(y, c(0.25, 0.75)) + c(-IQR * coef, 0, IQR * coef)
+        quantile(y, c(0.25, 0.75)) + c(-IQR * coef, IQR * coef)
     }
 
     adj_L <- adj_points[1]
@@ -59,8 +59,6 @@ relevance_sigmoid <-
 
     s_L <- -log(1/delta - 1)/abs(adj_L*k)
     s_H <- log(1/delta - 1)/abs(adj_H*k)
-
-    y_new <- seq(0, 15, 0.01)
 
     rel_L <- 1/(1 + exp(-s_L*(y_new - adj_L)))
     rel_H <- 1/(1 + exp(-s_H*(y_new - adj_H)))

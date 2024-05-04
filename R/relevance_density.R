@@ -57,7 +57,7 @@ relevance_density <-
     }
     dens <- kde(y, h = h, eval.points = y_new)$estimate
     dens_scaled <- (dens - min(dens)) / (max(dens) - min(dens))
-    rel <- max(1 - alpha*dens, epsilon)
+    rel <- pmax(1 - alpha*dens, epsilon)
 
     return(list(
       rel = rel,
