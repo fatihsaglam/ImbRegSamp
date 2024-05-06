@@ -65,7 +65,8 @@ relevance_sigmoid <-
 
     rel <- rep(1, length(y_new))
     rel[y_new > median(y)] <- rel_H[y_new > median(y)]
-    rel[y_new <= median(y)] <- rel_L[y_new <= median(y)]
+    rel[y_new < median(y)] <- rel_L[y_new < median(y)]
+    rel[y_new == median(y)] <- 0
 
     return(list(
       rel = rel,
