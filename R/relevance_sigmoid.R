@@ -48,30 +48,34 @@ relevance_sigmoid <-
            delta = 1e-4,
            k = 0.5) {
 
+    y_med <- median(y)
+    y_scaled <- y - y_med
+    y_new_scaled <- y_new - y_med
+
     if (is.null(adj_points)) {
-      IQR <- IQR(y)
+      IQR <- IQR(y_scaled)
       adj_points <-
-        quantile(y, c(0.25, 0.75)) + c(-IQR * coef, IQR * coef)
+        quantile(y_scaled, c(0.25, 0.75)) + c(-IQR * coef, IQR * coef)
     }
 
-    adj_L <- adj_points[1]
-    adj_H <- adj_points[2]
+    c_L <- adj_points[1]
+    c_H <- adj_points[2]
 
-    s_L <- -log(1/delta - 1)/abs(adj_L*k)
-    s_H <- log(1/delta - 1)/abs(adj_H*k)
+    s_L <- -log(1/delta - 1)/abs(c_L*k)
+    s_H <- log(1/delta - 1)/abs(c_H*k)
 
-    rel_L <- 1/(1 + exp(-s_L*(y_new - adj_L)))
-    rel_H <- 1/(1 + exp(-s_H*(y_new - adj_H)))
+    rel_L <- 1/(1 + exp(-s_L*(y_new_scaled - c_L)))
+    rel_H <- 1/(1 + exp(-s_H*(y_new_scaled - c_H)))
 
     rel <- rep(1, length(y_new))
-    rel[y_new > median(y)] <- rel_H[y_new > median(y)]
-    rel[y_new < median(y)] <- rel_L[y_new < median(y)]
-    rel[y_new == median(y)] <- 0
+    rel[y_new_scaled > 0] <- rel_H[y_new_scaled > 0]
+    rel[y_new_scaled < 0] <- rel_L[y_new_scaled < 0]
 
     return(list(
       rel = rel,
       rel_model = list(method = "sigmoid",
                        pars = list(y = y,
+                                   y_med = y_med,
                                    adj_points = adj_points,
                                    delta = delta,
                                    k = k))
