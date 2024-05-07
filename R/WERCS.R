@@ -168,23 +168,23 @@ WERCS <- function(x,
     data_notRare[i_notRare_undersampled,]
   ### undersampling finished ###
 
-  data_syn_lower <-
+  data_lowerSyn <-
     generator_WERCS(data_rare = data_lowerRare,
                   perc_ov = perc_ov_lower, phi = phi[i_lowerRare])
-  data_syn_upper <-
+  data_upperSyn <-
     generator_WERCS(data_rare = data_upperRare,
                   perc_ov = perc_ov_upper, phi = phi[i_upperRare])
 
-  data_syn <- rbind(data_syn_lower,
-                    data_syn_upper)
+  data_syn <- rbind(data_lowerSyn,
+                    data_upperSyn)
   data_new <- rbind(data_notRare_undersampled,
-                    data_syn_lower,
-                    data_syn_upper,
+                    data_lowerSyn,
+                    data_upperSyn,
                     data_lowerRare,
                     data_upperRare)
   groups_new <- c(rep("notRare_undersampled", nrow(data_notRare_undersampled)),
-                  rep("syn_lower", nrow(data_syn_lower)),
-                  rep("syn_upper", nrow(data_syn_upper)),
+                  rep("lowerSyn", nrow(data_lowerSyn)),
+                  rep("upperSyn", nrow(data_upperSyn)),
                   rep("lowerRare", nrow(data_lowerRare)),
                   rep("upperRare", nrow(data_upperRare)))
   groups_new <- as.factor(groups_new)
