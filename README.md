@@ -19,7 +19,7 @@ and Ribeiro 2017)
 6- GSMOTER (Geometric SMOTE for Regression) (Camacho, Douzas, and Bacao
 2022)
 
-7- SMOTERWB (SMOTER with Boosting)
+7- RA-HyRL 
 
 Implemented metrics are:
 
